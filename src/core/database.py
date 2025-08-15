@@ -393,54 +393,74 @@ class DatabaseManager:
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get dashboard statistics"""
         try:
+            # Default stats
+            stats = {
+                'total_products': 0,
+                'total_customers': 0,
+                'today_sales': 0,
+                'today_revenue': 0,
+                'low_stock': 0,
+                'inventory_value': 0,
+                'total_stock': 0
+            }
+
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
 
-                stats = {}
+                # Get total products
+                try:
+                    cursor.execute("SELECT COUNT(*) FROM products")
+                    result = cursor.fetchone()
+                    stats['total_products'] = result[0] if result else 0
+                except Exception as e:
+                    logger.error(f"Error getting total products: {e}")
 
-                # Get basic stats
-                total_products_result = self.execute_query("SELECT COUNT(*) FROM products")
-                total_customers_result = self.execute_query("SELECT COUNT(*) FROM customers")
-                
-                total_products = total_products_result[0][0] if total_products_result else 0
-                total_customers = total_customers_result[0][0] if total_customers_result else 0
+                # Get total customers
+                try:
+                    cursor.execute("SELECT COUNT(*) FROM customers")
+                    result = cursor.fetchone()
+                    stats['total_customers'] = result[0] if result else 0
+                except Exception as e:
+                    logger.error(f"Error getting total customers: {e}")
 
                 # Today's sales
-                today = datetime.now().strftime('%Y-%m-%d')
-                today_sales_result = self.execute_query("""
-                    SELECT COUNT(*), COALESCE(SUM(final_amount), 0) 
-                    FROM sales 
-                    WHERE DATE(created_at) = ?
-                """, (today,))
-
-                today_sales_count = 0
-                today_sales_total = 0
-                if today_sales_result:
-                    today_sales_count, today_sales_total = today_sales_result[0]
+                try:
+                    today = datetime.now().strftime('%Y-%m-%d')
+                    cursor.execute("""
+                        SELECT COUNT(*), COALESCE(SUM(final_amount), 0) 
+                        FROM sales 
+                        WHERE DATE(created_at) = ?
+                    """, (today,))
+                    result = cursor.fetchone()
+                    if result:
+                        stats['today_sales'] = result[0] if result[0] else 0
+                        stats['today_revenue'] = result[1] if result[1] else 0
+                except Exception as e:
+                    logger.error(f"Error getting today's sales: {e}")
 
                 # Low stock products
-                low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE stock_quantity <= min_stock")
-                low_stock_count = low_stock_result[0][0] if low_stock_result else 0
+                try:
+                    cursor.execute("SELECT COUNT(*) FROM products WHERE stock_quantity <= min_stock")
+                    result = cursor.fetchone()
+                    stats['low_stock'] = result[0] if result else 0
+                except Exception as e:
+                    logger.error(f"Error getting low stock count: {e}")
 
                 # Inventory stats
-                inventory_result = self.execute_query("""
-                    SELECT COUNT(*), COALESCE(SUM(stock_quantity), 0), COALESCE(SUM(price * stock_quantity), 0)
-                    FROM products
-                """)
-
-                total_products_count = 0
-                total_stock = 0
-                inventory_value = 0
-                if inventory_result:
-                    total_products_count, total_stock, inventory_value = inventory_result[0]
-
-                stats['total_products'] = total_products
-                stats['total_customers'] = total_customers
-                stats['today_sales'] = today_sales_count
-                stats['today_revenue'] = today_sales_total
-                stats['low_stock'] = low_stock_count
-                stats['inventory_value'] = inventory_value
-                stats['total_stock'] = total_stock
+                try:
+                    cursor.execute("""
+                        SELECT 
+                            COUNT(*), 
+                            COALESCE(SUM(stock_quantity), 0), 
+                            COALESCE(SUM(price * stock_quantity), 0)
+                        FROM products
+                    """)
+                    result = cursor.fetchone()
+                    if result:
+                        stats['inventory_value'] = result[2] if result[2] else 0
+                        stats['total_stock'] = result[1] if result[1] else 0
+                except Exception as e:
+                    logger.error(f"Error getting inventory stats: {e}")
 
                 return stats
 
