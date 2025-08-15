@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -76,21 +75,21 @@ class SaleItem:
 
 class DatabaseManager:
     """Database manager for SQLite operations"""
-    
+
     def __init__(self, db_path: str = "data/database/shop.db"):
         """Initialize database manager"""
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         self._init_database()
         logger.info(f"Database initialized: {self.db_path}")
-    
+
     def _init_database(self):
         """Initialize database tables"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 # Products table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS products (
@@ -110,7 +109,7 @@ class DatabaseManager:
                     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
                 """)
-                
+
                 # Customers table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS customers (
@@ -125,7 +124,7 @@ class DatabaseManager:
                     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
                 """)
-                
+
                 # Sales table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS sales (
@@ -142,7 +141,7 @@ class DatabaseManager:
                     FOREIGN KEY (customer_id) REFERENCES customers (id)
                 )
                 """)
-                
+
                 # Sale items table
                 cursor.execute("""
                 CREATE TABLE IF NOT EXISTS sale_items (
@@ -157,21 +156,21 @@ class DatabaseManager:
                     FOREIGN KEY (product_id) REFERENCES products (id)
                 )
                 """)
-                
+
                 conn.commit()
                 logger.info("Database tables created successfully")
-                
+
         except Exception as e:
             logger.error(f"Error initializing database: {e}")
             raise
-    
+
     # Product operations
     def add_product(self, product: Product) -> bool:
         """Add new product"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                 INSERT INTO products (name, brand, model, price, cost, stock_quantity, 
                                     min_stock, category, description, barcode, image_path)
@@ -180,40 +179,40 @@ class DatabaseManager:
                       product.cost, product.stock_quantity, product.min_stock,
                       product.category, product.description, product.barcode,
                       product.image_path))
-                
+
                 conn.commit()
                 logger.info(f"Product added: {product.name}")
                 return True
-                
+
         except sqlite3.IntegrityError as e:
             logger.error(f"Product with barcode {product.barcode} already exists")
             return False
         except Exception as e:
             logger.error(f"Error adding product: {e}")
             return False
-    
+
     def get_all_products(self) -> List[Product]:
         """Get all products"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("SELECT * FROM products ORDER BY name")
                 rows = cursor.fetchall()
-                
+
                 return [Product(**dict(row)) for row in rows]
-                
+
         except Exception as e:
             logger.error(f"Error getting products: {e}")
             return []
-    
+
     def update_product(self, product: Product) -> bool:
         """Update product"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                 UPDATE products SET name=?, brand=?, model=?, price=?, cost=?,
                                   stock_quantity=?, min_stock=?, category=?,
@@ -224,96 +223,96 @@ class DatabaseManager:
                       product.cost, product.stock_quantity, product.min_stock,
                       product.category, product.description, product.barcode,
                       product.image_path, product.id))
-                
+
                 conn.commit()
                 logger.info(f"Product updated: {product.name}")
                 return cursor.rowcount > 0
-                
+
         except Exception as e:
             logger.error(f"Error updating product: {e}")
             return False
-    
+
     def delete_product(self, product_id: int) -> bool:
         """Delete product"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 cursor.execute("DELETE FROM products WHERE id=?", (product_id,))
                 conn.commit()
-                
+
                 logger.info(f"Product deleted: {product_id}")
                 return cursor.rowcount > 0
-                
+
         except Exception as e:
             logger.error(f"Error deleting product: {e}")
             return False
-    
+
     def search_products(self, search_term: str) -> List[Product]:
         """Search products by name, brand, or model"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 search_pattern = f"%{search_term}%"
                 cursor.execute("""
                 SELECT * FROM products 
                 WHERE name LIKE ? OR brand LIKE ? OR model LIKE ?
                 ORDER BY name
                 """, (search_pattern, search_pattern, search_pattern))
-                
+
                 rows = cursor.fetchall()
                 return [Product(**dict(row)) for row in rows]
-                
+
         except Exception as e:
             logger.error(f"Error searching products: {e}")
             return []
-    
+
     # Customer operations
     def add_customer(self, customer: Customer) -> bool:
         """Add new customer"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                 INSERT INTO customers (name, phone, email, address, notes)
                 VALUES (?, ?, ?, ?, ?)
                 """, (customer.name, customer.phone, customer.email,
                       customer.address, customer.notes))
-                
+
                 conn.commit()
                 logger.info(f"Customer added: {customer.name}")
                 return True
-                
+
         except Exception as e:
             logger.error(f"Error adding customer: {e}")
             return False
-    
+
     def get_all_customers(self) -> List[Customer]:
         """Get all customers"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("SELECT * FROM customers ORDER BY name")
                 rows = cursor.fetchall()
-                
+
                 return [Customer(**dict(row)) for row in rows]
-                
+
         except Exception as e:
             logger.error(f"Error getting customers: {e}")
             return []
-    
+
     # Sales operations
     def create_sale(self, sale: Sale, items: List[SaleItem]) -> Optional[int]:
         """Create new sale with items"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 # Insert sale
                 cursor.execute("""
                 INSERT INTO sales (customer_id, customer_name, total_amount,
@@ -322,9 +321,9 @@ class DatabaseManager:
                 """, (sale.customer_id, sale.customer_name, sale.total_amount,
                       sale.discount, sale.tax, sale.final_amount,
                       sale.payment_method, sale.notes))
-                
+
                 sale_id = cursor.lastrowid
-                
+
                 # Insert sale items and update stock
                 for item in items:
                     cursor.execute("""
@@ -333,130 +332,151 @@ class DatabaseManager:
                     VALUES (?, ?, ?, ?, ?, ?)
                     """, (sale_id, item.product_id, item.product_name,
                           item.quantity, item.unit_price, item.total_price))
-                    
+
                     # Update product stock
                     cursor.execute("""
                     UPDATE products SET stock_quantity = stock_quantity - ?
                     WHERE id = ?
                     """, (item.quantity, item.product_id))
-                
+
                 # Update customer total purchases
                 if sale.customer_id:
                     cursor.execute("""
                     UPDATE customers SET total_purchases = total_purchases + ?
                     WHERE id = ?
                     """, (sale.final_amount, sale.customer_id))
-                
+
                 conn.commit()
                 logger.info(f"Sale created: {sale_id}")
                 return sale_id
-                
+
         except Exception as e:
             logger.error(f"Error creating sale: {e}")
             return None
-    
+
     def get_recent_sales(self, limit: int = 50) -> List[Tuple[Sale, List[SaleItem]]]:
         """Get recent sales with items"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 # Get sales
                 cursor.execute("""
                 SELECT * FROM sales 
                 ORDER BY created_at DESC LIMIT ?
                 """, (limit,))
-                
+
                 sales_rows = cursor.fetchall()
                 sales_with_items = []
-                
+
                 for sale_row in sales_rows:
                     sale = Sale(**dict(sale_row))
-                    
+
                     # Get items for this sale
                     cursor.execute("""
                     SELECT * FROM sale_items WHERE sale_id = ?
                     """, (sale.id,))
-                    
+
                     items_rows = cursor.fetchall()
                     items = [SaleItem(**dict(item_row)) for item_row in items_rows]
-                    
+
                     sales_with_items.append((sale, items))
-                
+
                 return sales_with_items
-                
+
         except Exception as e:
             logger.error(f"Error getting recent sales: {e}")
             return []
-    
+
     # Statistics
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get dashboard statistics"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                
+
                 stats = {}
-                
-                # Products count
-                cursor.execute("SELECT COUNT(*) FROM products")
-                stats['products_count'] = cursor.fetchone()[0]
-                
-                # Low stock products
-                cursor.execute("SELECT COUNT(*) FROM products WHERE stock_quantity <= min_stock")
-                stats['low_stock_count'] = cursor.fetchone()[0]
-                
-                # Customers count
-                cursor.execute("SELECT COUNT(*) FROM customers")
-                stats['customers_count'] = cursor.fetchone()[0]
-                
+
+                # Get basic stats
+                total_products = self.execute_query("SELECT COUNT(*) FROM products WHERE status = 'active'")[0][0]
+                total_customers = self.execute_query("SELECT COUNT(*) FROM customers WHERE status = 'active'")[0][0]
+
                 # Today's sales
-                today = date.today().strftime('%Y-%m-%d')
-                cursor.execute("""
-                SELECT COUNT(*), COALESCE(SUM(final_amount), 0) 
-                FROM sales WHERE DATE(created_at) = ?
+                today = datetime.now().strftime('%Y-%m-%d')
+                today_sales_result = self.execute_query("""
+                    SELECT COUNT(*), COALESCE(SUM(total_amount), 0) 
+                    FROM sales 
+                    WHERE DATE(created_at) = ?
                 """, (today,))
-                
-                today_sales = cursor.fetchone()
-                stats['today_sales_count'] = today_sales[0]
-                stats['today_revenue'] = today_sales[1]
-                
-                # This month's revenue
-                month_start = date.today().replace(day=1).strftime('%Y-%m-%d')
-                cursor.execute("""
-                SELECT COALESCE(SUM(final_amount), 0) 
-                FROM sales WHERE DATE(created_at) >= ?
-                """, (month_start,))
-                
-                stats['month_revenue'] = cursor.fetchone()[0]
-                
-                # Total inventory value
-                cursor.execute("SELECT COALESCE(SUM(price * stock_quantity), 0) FROM products")
-                stats['inventory_value'] = cursor.fetchone()[0]
-                
+
+                today_sales_count, today_sales_total = today_sales_result[0]
+
+                # Check if stock_quantity column exists, if not use quantity
+                try:
+                    # Try with stock_quantity first
+                    low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE stock_quantity < 5 AND status = 'active'")
+                    low_stock_count = low_stock_result[0][0]
+
+                    inventory_result = self.execute_query("""
+                        SELECT COUNT(*), COALESCE(SUM(stock_quantity), 0)
+                        FROM products 
+                        WHERE status = 'active'
+                    """)
+                except:
+                    # Fallback to quantity column
+                    low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE quantity < 5 AND status = 'active'")
+                    low_stock_count = low_stock_result[0][0]
+
+                    inventory_result = self.execute_query("""
+                        SELECT COUNT(*), COALESCE(SUM(quantity), 0)
+                        FROM products 
+                        WHERE status = 'active'
+                    """)
+
+                total_products_count, total_stock = inventory_result[0]
+
+                stats['products_count'] = total_products
+                stats['customers_count'] = total_customers
+                stats['today_sales_count'] = today_sales_count
+                stats['today_revenue'] = today_sales_total
+                stats['low_stock_count'] = low_stock_count
+                stats['inventory_value'] = total_stock # Assuming total_stock is the value if price is not multiplied
+
                 return stats
-                
+
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {e}")
             return {}
-    
+
     def get_low_stock_products(self) -> List[Product]:
         """Get products with low stock"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                
+
                 cursor.execute("""
                 SELECT * FROM products 
                 WHERE stock_quantity <= min_stock 
                 ORDER BY stock_quantity ASC
                 """)
-                
+
                 rows = cursor.fetchall()
                 return [Product(**dict(row)) for row in rows]
-                
+
         except Exception as e:
             logger.error(f"Error getting low stock products: {e}")
+            return []
+
+    # Helper method to execute queries, used internally by get_dashboard_stats
+    def execute_query(self, query: str, params: Tuple = ()) -> List[Tuple]:
+        """Execute a query and return results"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                return cursor.fetchall()
+        except Exception as e:
+            logger.error(f"Error executing query: {e}")
             return []

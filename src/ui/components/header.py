@@ -142,20 +142,27 @@ class HeaderBar(ctk.CTkFrame):
             current_theme = self.settings_manager.display.theme
             new_theme = "light" if current_theme == "dark" else "dark"
 
-            self.theme_manager.switch_theme(new_theme)
-
-            # Update theme button icon
-            theme_button = None
-            for child in self.winfo_children():
-                if isinstance(child, ctk.CTkFrame):
-                    for grandchild in child.winfo_children():
-                        if isinstance(grandchild, ctk.CTkButton) and grandchild.cget("width") == 40:
-                            theme_button = grandchild
-                            break
-
-            if theme_button:
-                new_icon = "🌙" if new_theme == "dark" else "☀️"
-                theme_button.configure(text=new_icon)
+            # Update the settings first
+            self.settings_manager.update_display_settings(theme=new_theme)
+            
+            # Switch theme using theme manager
+            if self.theme_manager.switch_theme(new_theme):
+                # Find and update theme button icon
+                for child in self.winfo_children():
+                    if isinstance(child, ctk.CTkFrame):
+                        for grandchild in child.winfo_children():
+                            if isinstance(grandchild, ctk.CTkButton) and hasattr(grandchild, '_command'):
+                                try:
+                                    if grandchild.cget("width") == 40:
+                                        new_icon = "🌙" if new_theme == "dark" else "☀️"
+                                        grandchild.configure(text=new_icon)
+                                        break
+                                except:
+                                    continue
+                
+                # Request full app restart to apply theme properly
+                from tkinter import messagebox
+                messagebox.showinfo("تبديل المظهر", "تم تبديل المظهر بنجاح! قم بإعادة تشغيل التطبيق لتطبيق التغييرات بالكامل.")
 
             logger.info(f"Theme toggled to: {new_theme}")
 
