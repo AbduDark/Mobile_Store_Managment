@@ -22,6 +22,10 @@ class ThemeManager:
     def __init__(self, settings_manager):
         """Initialize theme manager"""
         self.settings_manager = settings_manager
+        
+        # Initialize font names with defaults first
+        self.arabic_font_name = "Tahoma"
+        self.header_font_name = "Tahoma"
 
         # Color schemes
         self.themes = {
@@ -59,11 +63,9 @@ class ThemeManager:
             }
         }
 
-        # Initialize current_theme and setup fonts before applying theme
+        # Initialize current_theme and apply basic theme
         self.current_theme = self.settings_manager.get_setting("display", "theme", "dark")
-        self._setup_custom_fonts()
-        self._setup_fonts() # This calls the new _setup_fonts logic.
-
+        
         self.apply_theme()
         logger.info("Theme manager initialized successfully")
 
@@ -140,13 +142,20 @@ class ThemeManager:
                 return font
         return "Tahoma"  # fallback
 
+    def initialize_fonts(self):
+        """Initialize fonts after main window is created"""
+        try:
+            self._setup_custom_fonts()
+            logger.info("Fonts initialized successfully")
+        except Exception as e:
+            logger.warning(f"Failed to initialize custom fonts: {e}")
+            # Keep default fallback fonts
+            pass
+
     def _setup_fonts(self):
         """Setup Arabic fonts based on availability."""
-        # These are now handled within _setup_custom_fonts to determine self.arabic_font_name and self.header_font_name
-        # The logic here is to ensure that if custom fonts failed to register, we use system fallbacks.
-        # The variables are set in _setup_custom_fonts. This method serves as a placeholder to ensure the workflow.
-        # If _setup_custom_fonts properly sets font names, this method might become redundant or need minimal logic.
-        pass # Logic is now primarily in _setup_custom_fonts
+        # This method is kept for compatibility but logic moved to initialize_fonts
+        pass
 
 
     def apply_theme(self):
