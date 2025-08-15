@@ -157,6 +157,89 @@ class DatabaseManager:
                 )
                 """)
 
+                # Cash transactions table - لتتبع حركة الكاش
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS cash_transactions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    transaction_type TEXT NOT NULL, -- 'in', 'out', 'transfer'
+                    amount REAL NOT NULL,
+                    from_method TEXT, -- 'cash', 'bank', 'card', etc.
+                    to_method TEXT,   -- 'cash', 'bank', 'card', etc.
+                    description TEXT,
+                    reference_id INTEGER, -- sale_id, expense_id, etc.
+                    reference_type TEXT,  -- 'sale', 'expense', 'transfer'
+                    created_by TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """)
+
+                # Daily cash summary table - ملخص يومي للكاش
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS daily_cash_summary (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date DATE NOT NULL UNIQUE,
+                    opening_balance REAL DEFAULT 0,
+                    total_cash_in REAL DEFAULT 0,
+                    total_cash_out REAL DEFAULT 0,
+                    total_transfers_in REAL DEFAULT 0,
+                    total_transfers_out REAL DEFAULT 0,
+                    closing_balance REAL DEFAULT 0,
+                    notes TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """)
+
+                # Expenses table - المصروفات
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id INTEGER PRIMARYKEY AUTOINCREMENT,
+                    category TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    amount REAL NOT NULL,
+                    payment_method TEXT DEFAULT 'cash',
+                    supplier TEXT,
+                    invoice_number TEXT,
+                    notes TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """)
+
+                # Payment methods table - طرق الدفع المتاحة
+                cursor.execute("""
+                CREATE TABLE IF NOT EXISTS payment_methods (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL UNIQUE,
+                    display_name TEXT NOT NULL,
+                    is_active BOOLEAN DEFAULT 1,
+                    requires_transfer BOOLEAN DEFAULT 0,
+                    icon TEXT,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """)
+
+                # Insert default payment methods
+                default_methods = [
+                    ('cash', 'نقداً 💵', 1, 0, '💵'),
+                    ('card', 'بطاقة ائتمان 💳', 1, 0, '💳'),
+                    ('bank_transfer', 'تحويل بنكي 🏦', 1, 1, '🏦'),
+                    ('e_wallet', 'محفظة إلكترونية 📱', 1, 1, '📱'),
+                    ('installment', 'تقسيط 📅', 1, 0, '📅'),
+                    ('vodafone_cash', 'فودافون كاش', 1, 1, '📱'),
+                    ('orange_cash', 'أورانج كاش', 1, 1, '📱'),
+                    ('etisalat_cash', 'اتصالات كاش', 1, 1, '📱'),
+                    ('fawry', 'فوري', 1, 1, '📱'),
+                    ('aman', 'أمان', 1, 1, '📱')
+                ]
+
+                for method in default_methods:
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO payment_methods 
+                        (name, display_name, is_active, requires_transfer, icon)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, method)
+
+
                 conn.commit()
                 logger.info("Database tables created successfully")
 

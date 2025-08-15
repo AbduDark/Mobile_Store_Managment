@@ -168,7 +168,23 @@ class ThemeManager:
 
         # Apply theme to CustomTkinter
         ctk.set_appearance_mode(self.current_theme)
-        # ctk.set_default_color_theme("blue") # Removed as per changes, it's not in the snippet
+        ctk.set_default_color_theme("blue")
+        
+        # Configure matplotlib for Arabic fonts
+        try:
+            import matplotlib.pyplot as plt
+            import matplotlib.font_manager as fm
+            
+            # Configure matplotlib for Arabic text
+            plt.rcParams['font.family'] = [self.arabic_font_name, 'DejaVu Sans', 'Arial Unicode MS']
+            plt.rcParams['axes.unicode_minus'] = False
+            plt.rcParams['font.size'] = 10
+            
+            # Set RTL text direction
+            plt.rcParams['figure.autolayout'] = True
+            
+        except ImportError:
+            pass
 
     def get_colors(self) -> Dict[str, str]:
         """Get current theme colors"""

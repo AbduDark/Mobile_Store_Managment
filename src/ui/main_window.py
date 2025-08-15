@@ -52,6 +52,9 @@ class MainWindow(ctk.CTk):
         # Current view tracking
         self.current_view = None
 
+        # Initialize fonts after window creation
+        self.theme_manager.initialize_fonts()
+        
         # Initialize UI
         self._setup_ui()
         self._show_dashboard()
