@@ -418,3 +418,24 @@
 2025-08-15 21:13:36,616 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
 2025-08-15 21:13:36,617 - __main__ - INFO - Application setup completed successfully
 2025-08-15 21:13:37,250 - __main__ - ERROR - Critical error in main application: cannot import name 'SettingsView' from 'src.ui.views.settings' (/home/runner/workspace/src/ui/views/settings.py)
+2025-08-15 21:16:54,301 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
+2025-08-15 21:16:54,303 - __main__ - INFO - Application setup completed successfully
+2025-08-15 21:16:54,894 - src.core.settings - INFO - Settings loaded successfully
+2025-08-15 21:16:54,894 - src.core.settings - INFO - Settings manager initialized
+2025-08-15 21:16:54,894 - src.app - INFO - Settings manager initialized
+2025-08-15 21:16:54,895 - src.core.database - INFO - Database tables created successfully
+2025-08-15 21:16:54,895 - src.core.database - INFO - Database initialized: data/database/shop.db
+2025-08-15 21:16:54,895 - src.app - INFO - Database manager initialized
+2025-08-15 21:16:54,895 - src.core.theme - INFO - Theme manager initialized successfully
+2025-08-15 21:16:54,895 - src.app - INFO - Theme manager initialized
+2025-08-15 21:16:55,029 - src.ui.components.header - INFO - Header bar component initialized
+2025-08-15 21:16:55,069 - src.ui.components.sidebar - INFO - Sidebar component initialized
+2025-08-15 21:16:55,215 - src.core.database - ERROR - Error executing query: no such column: status
+2025-08-15 21:16:55,216 - src.core.database - ERROR - Error getting dashboard stats: list index out of range
+2025-08-15 21:16:55,216 - src.ui.views.dashboard - ERROR - Error loading dashboard data: 'total_products'
+2025-08-15 21:16:56,036 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:02,037 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:08,039 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:14,040 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:20,041 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:26,105 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
