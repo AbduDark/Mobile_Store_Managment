@@ -1,9 +1,8 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Theme Manager
-مدير الموضوع والألوان
+مدير السمات
 """
 
 import customtkinter as ctk
@@ -11,6 +10,7 @@ from typing import Dict, Any
 import tkinter.font as tkfont
 from pathlib import Path
 import os
+import platform
 
 from src.utils.logger import get_logger
 
@@ -22,10 +22,6 @@ class ThemeManager:
     def __init__(self, settings_manager):
         """Initialize theme manager"""
         self.settings_manager = settings_manager
-
-        # Configure custom Arabic fonts
-        self._setup_custom_fonts()
-        self._setup_fonts()
 
         # Color schemes
         self.themes = {
@@ -63,118 +59,127 @@ class ThemeManager:
             }
         }
 
+        # Initialize current_theme and setup fonts before applying theme
+        self.current_theme = self.settings_manager.get_setting("display", "theme", "dark")
+        self._setup_custom_fonts()
+        self._setup_fonts() # This calls the new _setup_fonts logic.
+
         self.apply_theme()
-        logger.info("Theme manager initialized with custom fonts")
+        logger.info("Theme manager initialized successfully")
 
     def _setup_custom_fonts(self):
-        """Setup custom Arabic fonts from assets"""
-        import tkinter as tk
-        
-        # Create hidden root to register fonts
-        root = tk.Tk()
-        root.withdraw()
-        
+        """Setup custom Arabic fonts"""
+        # Font paths
+        fonts_dir = Path("assets/fonts")
+        hayah_path = fonts_dir / "Hayah.otf"
+        shorooq_path = fonts_dir / "Shorooq.ttf"
+
         try:
-            # Register Hayah font for general text
-            hayah_path = Path("assets/fonts/Hayah.otf")
+            # Register fonts if files exist
             if hayah_path.exists():
-                try:
-                    # For Windows
+                if platform.system() == "Windows":
                     import ctypes
                     from ctypes import wintypes
                     gdi32 = ctypes.windll.gdi32
-                    gdi32.AddFontResourceW(str(hayah_path.absolute()))
-                    self.hayah_font_available = True
+                    gdi32.AddFontResourceW.argtypes = [wintypes.LPCWSTR]
+                    gdi32.AddFontResourceW(str(hayah_path))
                     logger.info("Hayah font registered successfully")
-                except:
-                    # For Linux/Mac - copy to system fonts or use directly
-                    self.hayah_font_available = True
-                    logger.info("Hayah font path available")
-            else:
-                self.hayah_font_available = False
-                logger.warning("Hayah font file not found")
-            
-            # Register Shorooq font for headers
-            shorooq_path = Path("assets/fonts/Shorooq.ttf")
+                else:
+                    # For Linux/Mac, font registration might require different steps
+                    # or simply ensuring the font is available in the system.
+                    # For now, we log that the path is available.
+                    logger.info("Hayah font path available (registration may differ on non-Windows)")
+
             if shorooq_path.exists():
-                try:
-                    # For Windows
-                    import ctypes
-                    gdi32 = ctypes.windll.gdi32
-                    gdi32.AddFontResourceW(str(shorooq_path.absolute()))
-                    self.shorooq_font_available = True
+                if platform.system() == "Windows":
+                    gdi32.AddFontResourceW(str(shorooq_path))
                     logger.info("Shorooq font registered successfully")
-                except:
-                    # For Linux/Mac
-                    self.shorooq_font_available = True
-                    logger.info("Shorooq font path available")
-            else:
-                self.shorooq_font_available = False
-                logger.warning("Shorooq font file not found")
-                
+                else:
+                    logger.info("Shorooq font path available (registration may differ on non-Windows)")
+
         except Exception as e:
-            logger.error(f"Error setting up custom fonts: {e}")
-            self.hayah_font_available = False
-            self.shorooq_font_available = False
-        finally:
-            root.destroy()
+            logger.warning(f"Could not register custom fonts: {e}")
+            # Fallback to system fonts if registration fails
+            self.arabic_font_name = "Arial"
+            self.header_font_name = "Arial"
+        
+        # Set default font names, falling back if registration failed or files are missing
+        if self.is_font_registered("Hayah"):
+             self.arabic_font_name = "Hayah"
+        else:
+             self.arabic_font_name = self._find_best_arabic_font()
+
+        if self.is_font_registered("Shorooq"):
+            self.header_font_name = "Shorooq"
+        else:
+            self.header_font_name = self.arabic_font_name # Fallback header to general Arabic font
+
+
+        logger.info(f"Using general Arabic font: {self.arabic_font_name}")
+        logger.info(f"Using header Arabic font: {self.header_font_name}")
+
+    def _is_font_registered(self, font_name: str) -> bool:
+        """Check if a font is available in the system."""
+        try:
+            # Using tkinter.font to check for font families
+            font_families = tkfont.families()
+            return font_name in font_families
+        except Exception as e:
+            logger.warning(f"Error checking font availability for {font_name}: {e}")
+            return False
+
+    def _find_best_arabic_font(self) -> str:
+        """Find the best available Arabic font from a list of preferred fonts."""
+        arabic_fonts = [
+            "Cairo", "Amiri", "Scheherazade New", "Noto Sans Arabic",
+            "Traditional Arabic", "Arabic Typesetting", "Tahoma", "Segoe UI"
+        ]
+        available_fonts = tkfont.families()
+        for font in arabic_fonts:
+            if font in available_fonts:
+                return font
+        return "Tahoma"  # fallback
 
     def _setup_fonts(self):
-        """Setup Arabic fonts"""
-        # Arabic fonts in order of preference for general text
-        if self.hayah_font_available:
-            self.arabic_font = "Hayah"
-        else:
-            arabic_fonts = [
-                "Cairo",
-                "Amiri",
-                "Scheherazade New",
-                "Noto Sans Arabic",
-                "Traditional Arabic",
-                "Arabic Typesetting",
-                "Tahoma",
-                "Segoe UI"
-            ]
-            
-            # Get available fonts
-            available_fonts = tkfont.families()
-            
-            # Find best Arabic font
-            self.arabic_font = "Tahoma"  # fallback
-            for font in arabic_fonts:
-                if font in available_fonts:
-                    self.arabic_font = font
-                    break
+        """Setup Arabic fonts based on availability."""
+        # These are now handled within _setup_custom_fonts to determine self.arabic_font_name and self.header_font_name
+        # The logic here is to ensure that if custom fonts failed to register, we use system fallbacks.
+        # The variables are set in _setup_custom_fonts. This method serves as a placeholder to ensure the workflow.
+        # If _setup_custom_fonts properly sets font names, this method might become redundant or need minimal logic.
+        pass # Logic is now primarily in _setup_custom_fonts
 
-        # Header font
-        if self.shorooq_font_available:
-            self.header_font = "Shorooq"
-        else:
-            self.header_font = self.arabic_font
-
-        logger.info(f"Using general Arabic font: {self.arabic_font}")
-        logger.info(f"Using header Arabic font: {self.header_font}")
 
     def apply_theme(self):
         """Apply current theme"""
-        theme_name = self.settings_manager.get_setting("theme", "dark")
+        theme_name = self.settings_manager.get_setting("display", "theme", "dark")
+        if theme_name in self.themes:
+            self.current_theme = theme_name
+        else:
+            self.current_theme = "dark" # Default to dark if invalid theme name
 
-        # Set CustomTkinter theme
-        ctk.set_appearance_mode(theme_name)
-        ctk.set_default_color_theme("blue")
+        # Apply theme to CustomTkinter
+        ctk.set_appearance_mode(self.current_theme)
+        # ctk.set_default_color_theme("blue") # Removed as per changes, it's not in the snippet
 
     def get_colors(self) -> Dict[str, str]:
         """Get current theme colors"""
-        theme_name = self.settings_manager.get_setting("theme", "dark")
-        return self.themes.get(theme_name, self.themes["dark"])
+        return self.themes.get(self.current_theme, self.themes["dark"])
 
-    def get_font_config(self, size: int = 12, weight: str = "normal") -> tuple:
-        """Get font configuration for Arabic text (Hayah)"""
-        return (self.arabic_font, size, weight)
+    def get_font_config(self, size: int = 12, weight: str = "normal") -> ctk.CTkFont:
+        """Get font configuration for Arabic text"""
+        return ctk.CTkFont(
+            family=self.arabic_font_name,
+            size=size,
+            weight=weight
+        )
 
-    def get_header_font_config(self, size: int = 16, weight: str = "bold") -> tuple:
-        """Get font configuration for Arabic headers (Shorooq)"""
-        return (self.header_font, size, weight)
+    def get_header_font_config(self, size: int = 16, weight: str = "bold") -> ctk.CTkFont:
+        """Get font configuration for Arabic headers"""
+        return ctk.CTkFont(
+            family=self.header_font_name,
+            size=size,
+            weight=weight
+        )
 
     def get_english_font_config(self, size: int = 12, weight: str = "normal") -> tuple:
         """Get font configuration for English text"""
@@ -183,7 +188,7 @@ class ThemeManager:
     def switch_theme(self, theme_name: str):
         """Switch to a different theme"""
         if theme_name in ["dark", "light"]:
-            self.settings_manager.update_setting("theme", theme_name)
+            self.settings_manager.update_setting("display", "theme", theme_name)
             self.apply_theme()
             logger.info(f"Switched to theme: {theme_name}")
             return True
