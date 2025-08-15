@@ -21,7 +21,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         
         # Configure matplotlib for Arabic support
         from utils.font_loader import configure_matplotlib_arabic
-from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
+        from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
         configure_matplotlib_arabic()
         
         self.create_widgets()
