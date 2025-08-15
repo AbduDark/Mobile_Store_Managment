@@ -104,12 +104,12 @@ class ThemeManager:
             self.header_font_name = "Arial"
         
         # Set default font names, falling back if registration failed or files are missing
-        if self.is_font_registered("Hayah"):
+        if self._is_font_registered("Hayah"):
              self.arabic_font_name = "Hayah"
         else:
              self.arabic_font_name = self._find_best_arabic_font()
 
-        if self.is_font_registered("Shorooq"):
+        if self._is_font_registered("Shorooq"):
             self.header_font_name = "Shorooq"
         else:
             self.header_font_name = self.arabic_font_name # Fallback header to general Arabic font
