@@ -399,55 +399,62 @@ class DatabaseManager:
                 stats = {}
 
                 # Get basic stats
-                total_products = self.execute_query("SELECT COUNT(*) FROM products WHERE status = 'active'")[0][0]
-                total_customers = self.execute_query("SELECT COUNT(*) FROM customers WHERE status = 'active'")[0][0]
+                total_products_result = self.execute_query("SELECT COUNT(*) FROM products")
+                total_customers_result = self.execute_query("SELECT COUNT(*) FROM customers")
+                
+                total_products = total_products_result[0][0] if total_products_result else 0
+                total_customers = total_customers_result[0][0] if total_customers_result else 0
 
                 # Today's sales
                 today = datetime.now().strftime('%Y-%m-%d')
                 today_sales_result = self.execute_query("""
-                    SELECT COUNT(*), COALESCE(SUM(total_amount), 0) 
+                    SELECT COUNT(*), COALESCE(SUM(final_amount), 0) 
                     FROM sales 
                     WHERE DATE(created_at) = ?
                 """, (today,))
 
-                today_sales_count, today_sales_total = today_sales_result[0]
+                today_sales_count = 0
+                today_sales_total = 0
+                if today_sales_result:
+                    today_sales_count, today_sales_total = today_sales_result[0]
 
-                # Check if stock_quantity column exists, if not use quantity
-                try:
-                    # Try with stock_quantity first
-                    low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE stock_quantity < 5 AND status = 'active'")
-                    low_stock_count = low_stock_result[0][0]
+                # Low stock products
+                low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE stock_quantity <= min_stock")
+                low_stock_count = low_stock_result[0][0] if low_stock_result else 0
 
-                    inventory_result = self.execute_query("""
-                        SELECT COUNT(*), COALESCE(SUM(stock_quantity), 0)
-                        FROM products 
-                        WHERE status = 'active'
-                    """)
-                except:
-                    # Fallback to quantity column
-                    low_stock_result = self.execute_query("SELECT COUNT(*) FROM products WHERE quantity < 5 AND status = 'active'")
-                    low_stock_count = low_stock_result[0][0]
+                # Inventory stats
+                inventory_result = self.execute_query("""
+                    SELECT COUNT(*), COALESCE(SUM(stock_quantity), 0), COALESCE(SUM(price * stock_quantity), 0)
+                    FROM products
+                """)
 
-                    inventory_result = self.execute_query("""
-                        SELECT COUNT(*), COALESCE(SUM(quantity), 0)
-                        FROM products 
-                        WHERE status = 'active'
-                    """)
+                total_products_count = 0
+                total_stock = 0
+                inventory_value = 0
+                if inventory_result:
+                    total_products_count, total_stock, inventory_value = inventory_result[0]
 
-                total_products_count, total_stock = inventory_result[0]
-
-                stats['products_count'] = total_products
-                stats['customers_count'] = total_customers
-                stats['today_sales_count'] = today_sales_count
+                stats['total_products'] = total_products
+                stats['total_customers'] = total_customers
+                stats['today_sales'] = today_sales_count
                 stats['today_revenue'] = today_sales_total
-                stats['low_stock_count'] = low_stock_count
-                stats['inventory_value'] = total_stock # Assuming total_stock is the value if price is not multiplied
+                stats['low_stock'] = low_stock_count
+                stats['inventory_value'] = inventory_value
+                stats['total_stock'] = total_stock
 
                 return stats
 
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {e}")
-            return {}
+            return {
+                'total_products': 0,
+                'total_customers': 0,
+                'today_sales': 0,
+                'today_revenue': 0,
+                'low_stock': 0,
+                'inventory_value': 0,
+                'total_stock': 0
+            }
 
     def get_low_stock_products(self) -> List[Product]:
         """Get products with low stock"""

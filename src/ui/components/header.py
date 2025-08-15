@@ -144,7 +144,7 @@ class HeaderBar(ctk.CTkFrame):
 
             # Update the settings first
             self.settings_manager.update_display_settings(theme=new_theme)
-            
+
             # Switch theme using theme manager
             if self.theme_manager.switch_theme(new_theme):
                 # Find and update theme button icon
@@ -159,7 +159,7 @@ class HeaderBar(ctk.CTkFrame):
                                         break
                                 except:
                                     continue
-                
+
                 # Request full app restart to apply theme properly
                 from tkinter import messagebox
                 messagebox.showinfo("تبديل المظهر", "تم تبديل المظهر بنجاح! قم بإعادة تشغيل التطبيق لتطبيق التغييرات بالكامل.")

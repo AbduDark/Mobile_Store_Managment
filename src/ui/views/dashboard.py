@@ -458,19 +458,29 @@ class DashboardView(ctk.CTkFrame):
         try:
             stats = self.db_manager.get_dashboard_stats()
             
-            # Update stat cards
+            # Update stat cards with safe defaults
             if "total_products" in self.stats_cards:
-                self.stats_cards["total_products"].value_label.configure(text=str(stats['total_products']))
+                self.stats_cards["total_products"].value_label.configure(
+                    text=str(stats.get('total_products', 0))
+                )
             
             if "total_customers" in self.stats_cards:
-                self.stats_cards["total_customers"].value_label.configure(text=str(stats['total_customers']))
+                self.stats_cards["total_customers"].value_label.configure(
+                    text=str(stats.get('total_customers', 0))
+                )
             
             if "today_sales" in self.stats_cards:
-                self.stats_cards["today_sales"].value_label.configure(text=str(stats['today_sales']))
+                self.stats_cards["today_sales"].value_label.configure(
+                    text=f"{stats.get('today_sales', 0)} ({stats.get('today_revenue', 0):.0f} ر.س)"
+                )
             
             if "low_stock" in self.stats_cards:
-                self.stats_cards["low_stock"].value_label.configure(text=str(stats['low_stock']))
+                self.stats_cards["low_stock"].value_label.configure(
+                    text=str(stats.get('low_stock', 0))
+                )
                 
         except Exception as e:
             logger.error(f"Error loading dashboard data: {e}")
-            messagebox.showerror("خطأ", f"خطأ في تحميل بيانات لوحة التحكم: {e}")
+            # Set default values on error
+            for key in self.stats_cards:
+                self.stats_cards[key].value_label.configure(text="0")
