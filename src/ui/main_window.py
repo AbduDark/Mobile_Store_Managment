@@ -67,14 +67,19 @@ class MainWindow(ctk.CTk):
     
     def _configure_fonts(self):
         """Configure fonts for better Arabic display"""
-        # Set default fonts for CustomTkinter
+        # Set default fonts for CustomTkinter using Hayah font
         arabic_font = self.theme_manager.get_font_config(12)
+        header_font = self.theme_manager.get_header_font_config(14, "bold")
         
         # Update CustomTkinter default fonts
         ctk.ThemeManager.theme["CTkLabel"]["text_font"] = arabic_font
         ctk.ThemeManager.theme["CTkButton"]["text_font"] = arabic_font
         ctk.ThemeManager.theme["CTkEntry"]["text_font"] = arabic_font
         ctk.ThemeManager.theme["CTkTextbox"]["text_font"] = arabic_font
+        
+        # Store fonts for components to use
+        self.default_font = arabic_font
+        self.header_font = header_font
     
     def _setup_ui(self):
         """Setup main UI components"""

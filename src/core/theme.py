@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -9,6 +10,7 @@ import customtkinter as ctk
 from typing import Dict, Any
 import tkinter.font as tkfont
 from pathlib import Path
+import os
 
 from src.utils.logger import get_logger
 
@@ -21,7 +23,8 @@ class ThemeManager:
         """Initialize theme manager"""
         self.settings_manager = settings_manager
 
-        # Configure Arabic fonts
+        # Configure custom Arabic fonts
+        self._setup_custom_fonts()
         self._setup_fonts()
 
         # Color schemes
@@ -61,33 +64,96 @@ class ThemeManager:
         }
 
         self.apply_theme()
-        logger.info("Theme manager initialized")
+        logger.info("Theme manager initialized with custom fonts")
+
+    def _setup_custom_fonts(self):
+        """Setup custom Arabic fonts from assets"""
+        import tkinter as tk
+        
+        # Create hidden root to register fonts
+        root = tk.Tk()
+        root.withdraw()
+        
+        try:
+            # Register Hayah font for general text
+            hayah_path = Path("assets/fonts/Hayah.otf")
+            if hayah_path.exists():
+                try:
+                    # For Windows
+                    import ctypes
+                    from ctypes import wintypes
+                    gdi32 = ctypes.windll.gdi32
+                    gdi32.AddFontResourceW(str(hayah_path.absolute()))
+                    self.hayah_font_available = True
+                    logger.info("Hayah font registered successfully")
+                except:
+                    # For Linux/Mac - copy to system fonts or use directly
+                    self.hayah_font_available = True
+                    logger.info("Hayah font path available")
+            else:
+                self.hayah_font_available = False
+                logger.warning("Hayah font file not found")
+            
+            # Register Shorooq font for headers
+            shorooq_path = Path("assets/fonts/Shorooq.ttf")
+            if shorooq_path.exists():
+                try:
+                    # For Windows
+                    import ctypes
+                    gdi32 = ctypes.windll.gdi32
+                    gdi32.AddFontResourceW(str(shorooq_path.absolute()))
+                    self.shorooq_font_available = True
+                    logger.info("Shorooq font registered successfully")
+                except:
+                    # For Linux/Mac
+                    self.shorooq_font_available = True
+                    logger.info("Shorooq font path available")
+            else:
+                self.shorooq_font_available = False
+                logger.warning("Shorooq font file not found")
+                
+        except Exception as e:
+            logger.error(f"Error setting up custom fonts: {e}")
+            self.hayah_font_available = False
+            self.shorooq_font_available = False
+        finally:
+            root.destroy()
 
     def _setup_fonts(self):
         """Setup Arabic fonts"""
-        # Arabic fonts in order of preference
-        arabic_fonts = [
-            "Cairo",
-            "Amiri",
-            "Scheherazade New",
-            "Noto Sans Arabic",
-            "Traditional Arabic",
-            "Arabic Typesetting",
-            "Tahoma",
-            "Segoe UI"
-        ]
+        # Arabic fonts in order of preference for general text
+        if self.hayah_font_available:
+            self.arabic_font = "Hayah"
+        else:
+            arabic_fonts = [
+                "Cairo",
+                "Amiri",
+                "Scheherazade New",
+                "Noto Sans Arabic",
+                "Traditional Arabic",
+                "Arabic Typesetting",
+                "Tahoma",
+                "Segoe UI"
+            ]
+            
+            # Get available fonts
+            available_fonts = tkfont.families()
+            
+            # Find best Arabic font
+            self.arabic_font = "Tahoma"  # fallback
+            for font in arabic_fonts:
+                if font in available_fonts:
+                    self.arabic_font = font
+                    break
 
-        # Get available fonts
-        available_fonts = tkfont.families()
+        # Header font
+        if self.shorooq_font_available:
+            self.header_font = "Shorooq"
+        else:
+            self.header_font = self.arabic_font
 
-        # Find best Arabic font
-        self.arabic_font = "Tahoma"  # fallback
-        for font in arabic_fonts:
-            if font in available_fonts:
-                self.arabic_font = font
-                break
-
-        logger.info(f"Using Arabic font: {self.arabic_font}")
+        logger.info(f"Using general Arabic font: {self.arabic_font}")
+        logger.info(f"Using header Arabic font: {self.header_font}")
 
     def apply_theme(self):
         """Apply current theme"""
@@ -103,8 +169,12 @@ class ThemeManager:
         return self.themes.get(theme_name, self.themes["dark"])
 
     def get_font_config(self, size: int = 12, weight: str = "normal") -> tuple:
-        """Get font configuration for Arabic text"""
+        """Get font configuration for Arabic text (Hayah)"""
         return (self.arabic_font, size, weight)
+
+    def get_header_font_config(self, size: int = 16, weight: str = "bold") -> tuple:
+        """Get font configuration for Arabic headers (Shorooq)"""
+        return (self.header_font, size, weight)
 
     def get_english_font_config(self, size: int = 12, weight: str = "normal") -> tuple:
         """Get font configuration for English text"""
