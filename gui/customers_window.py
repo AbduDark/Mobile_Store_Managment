@@ -658,3 +658,199 @@ class CustomersWindow(ctk.CTkFrame):
                 filtered_customers.append(customer)
         
         self.display_customers(filtered_customers)
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Customers Window for Mobile Shop Management System
+نافذة العملاء لنظام إدارة محل الموبايلات
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox
+import sys
+import os
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
+
+class CustomersWindow(ctk.CTkFrame):
+    """Customers management window"""
+
+    def __init__(self, parent, db_manager):
+        super().__init__(parent)
+        self.db_manager = db_manager
+        self.create_widgets()
+        self.load_customers()
+
+    def create_widgets(self):
+        """Create the customers interface"""
+        # Title
+        self.title_label = ctk.CTkLabel(
+            self,
+            text="إدارة العملاء",
+            font=create_title_font(28)
+        )
+        self.title_label.pack(pady=(0, 20))
+
+        # Controls frame
+        self.controls_frame = ctk.CTkFrame(self)
+        self.controls_frame.pack(fill="x", padx=20, pady=(0, 20))
+
+        # Add customer button
+        self.add_button = ctk.CTkButton(
+            self.controls_frame,
+            text="إضافة عميل جديد",
+            command=self.add_customer,
+            font=create_button_font(14),
+            width=150,
+            height=40
+        )
+        self.add_button.pack(side="left", padx=10, pady=10)
+
+        # Search frame
+        self.search_frame = ctk.CTkFrame(self.controls_frame)
+        self.search_frame.pack(side="right", padx=10, pady=10)
+
+        self.search_entry = ctk.CTkEntry(
+            self.search_frame,
+            placeholder_text="البحث في العملاء...",
+            width=200
+        )
+        self.search_entry.pack(side="left", padx=5, pady=5)
+
+        self.search_button = ctk.CTkButton(
+            self.search_frame,
+            text="بحث",
+            command=self.search_customers,
+            width=80
+        )
+        self.search_button.pack(side="left", padx=5, pady=5)
+
+        # Customers list
+        self.customers_frame = ctk.CTkScrollableFrame(self, label_text="قائمة العملاء")
+        self.customers_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+
+    def load_customers(self):
+        """Load customers from database"""
+        try:
+            customers = self.db_manager.get_all_customers()
+            
+            # Clear existing widgets
+            for widget in self.customers_frame.winfo_children():
+                widget.destroy()
+
+            if not customers:
+                no_customers_label = ctk.CTkLabel(
+                    self.customers_frame,
+                    text="لا توجد عملاء. انقر على 'إضافة عميل جديد' لإضافة عميل.",
+                    font=create_body_font(14)
+                )
+                no_customers_label.pack(pady=50)
+                return
+
+            # Create customer cards
+            for customer in customers:
+                self.create_customer_card(customer)
+
+        except Exception as e:
+            messagebox.showerror("خطأ", f"حدث خطأ في تحميل العملاء: {e}")
+
+    def create_customer_card(self, customer):
+        """Create a customer card widget"""
+        card_frame = ctk.CTkFrame(self.customers_frame)
+        card_frame.pack(fill="x", padx=10, pady=5)
+
+        # Customer info
+        info_frame = ctk.CTkFrame(card_frame)
+        info_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+
+        # Name
+        name_label = ctk.CTkLabel(
+            info_frame,
+            text=customer['name'],
+            font=create_heading_font(16),
+            anchor="w"
+        )
+        name_label.pack(fill="x", padx=10, pady=(10, 5))
+
+        # Details
+        phone = customer.get('phone', 'غير محدد')
+        total_purchases = customer.get('total_purchases', 0)
+        details_text = f"الهاتف: {phone} | إجمالي المشتريات: {total_purchases:.2f} ريال"
+        details_label = ctk.CTkLabel(
+            info_frame,
+            text=details_text,
+            font=create_body_font(12),
+            anchor="w"
+        )
+        details_label.pack(fill="x", padx=10, pady=(0, 10))
+
+        # Buttons frame
+        buttons_frame = ctk.CTkFrame(card_frame)
+        buttons_frame.pack(side="right", padx=10, pady=10)
+
+        edit_button = ctk.CTkButton(
+            buttons_frame,
+            text="تعديل",
+            command=lambda c=customer: self.edit_customer(c),
+            width=80,
+            height=30
+        )
+        edit_button.pack(padx=5, pady=2)
+
+        view_button = ctk.CTkButton(
+            buttons_frame,
+            text="عرض المشتريات",
+            command=lambda c=customer: self.view_customer_purchases(c),
+            width=120,
+            height=30
+        )
+        view_button.pack(padx=5, pady=2)
+
+    def add_customer(self):
+        """Add new customer"""
+        messagebox.showinfo("قريباً", "ستتم إضافة نافذة إضافة العملاء قريباً")
+
+    def edit_customer(self, customer):
+        """Edit customer"""
+        messagebox.showinfo("قريباً", f"ستتم إضافة نافذة تعديل العميل: {customer['name']}")
+
+    def view_customer_purchases(self, customer):
+        """View customer purchases"""
+        messagebox.showinfo("مشتريات العميل", f"عرض مشتريات العميل: {customer['name']}")
+
+    def search_customers(self):
+        """Search customers"""
+        search_term = self.search_entry.get().strip()
+        if not search_term:
+            self.load_customers()
+            return
+
+        try:
+            # Simple search implementation
+            all_customers = self.db_manager.get_all_customers()
+            filtered_customers = [
+                customer for customer in all_customers
+                if search_term.lower() in customer['name'].lower() or
+                   (customer.get('phone') and search_term in customer['phone'])
+            ]
+
+            # Clear existing widgets
+            for widget in self.customers_frame.winfo_children():
+                widget.destroy()
+
+            if not filtered_customers:
+                no_results_label = ctk.CTkLabel(
+                    self.customers_frame,
+                    text=f"لا توجد نتائج للبحث: {search_term}",
+                    font=create_body_font(14)
+                )
+                no_results_label.pack(pady=50)
+            else:
+                for customer in filtered_customers:
+                    self.create_customer_card(customer)
+
+        except Exception as e:
+            messagebox.showerror("خطأ", f"حدث خطأ في البحث: {e}")

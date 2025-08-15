@@ -626,3 +626,205 @@ class ProductsWindow(ctk.CTkFrame):
                 filtered_products.append(product)
         
         self.display_products(filtered_products)
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Products Window for Mobile Shop Management System
+نافذة المنتجات لنظام إدارة محل الموبايلات
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox, filedialog
+import sys
+import os
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
+
+class ProductsWindow(ctk.CTkFrame):
+    """Products management window"""
+
+    def __init__(self, parent, db_manager):
+        super().__init__(parent)
+        self.db_manager = db_manager
+        self.create_widgets()
+        self.load_products()
+
+    def create_widgets(self):
+        """Create the products interface"""
+        # Title
+        self.title_label = ctk.CTkLabel(
+            self,
+            text="إدارة المنتجات",
+            font=create_title_font(28)
+        )
+        self.title_label.pack(pady=(0, 20))
+
+        # Controls frame
+        self.controls_frame = ctk.CTkFrame(self)
+        self.controls_frame.pack(fill="x", padx=20, pady=(0, 20))
+
+        # Add product button
+        self.add_button = ctk.CTkButton(
+            self.controls_frame,
+            text="إضافة منتج جديد",
+            command=self.add_product,
+            font=create_button_font(14),
+            width=150,
+            height=40
+        )
+        self.add_button.pack(side="left", padx=10, pady=10)
+
+        # Search frame
+        self.search_frame = ctk.CTkFrame(self.controls_frame)
+        self.search_frame.pack(side="right", padx=10, pady=10)
+
+        self.search_entry = ctk.CTkEntry(
+            self.search_frame,
+            placeholder_text="البحث في المنتجات...",
+            width=200
+        )
+        self.search_entry.pack(side="left", padx=5, pady=5)
+
+        self.search_button = ctk.CTkButton(
+            self.search_frame,
+            text="بحث",
+            command=self.search_products,
+            width=80
+        )
+        self.search_button.pack(side="left", padx=5, pady=5)
+
+        # Products list
+        self.products_frame = ctk.CTkScrollableFrame(self, label_text="قائمة المنتجات")
+        self.products_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+
+    def load_products(self):
+        """Load products from database"""
+        try:
+            products = self.db_manager.get_all_products()
+            
+            # Clear existing widgets
+            for widget in self.products_frame.winfo_children():
+                widget.destroy()
+
+            if not products:
+                no_products_label = ctk.CTkLabel(
+                    self.products_frame,
+                    text="لا توجد منتجات. انقر على 'إضافة منتج جديد' لإضافة منتج.",
+                    font=create_body_font(14)
+                )
+                no_products_label.pack(pady=50)
+                return
+
+            # Create product cards
+            for product in products:
+                self.create_product_card(product)
+
+        except Exception as e:
+            messagebox.showerror("خطأ", f"حدث خطأ في تحميل المنتجات: {e}")
+
+    def create_product_card(self, product):
+        """Create a product card widget"""
+        card_frame = ctk.CTkFrame(self.products_frame)
+        card_frame.pack(fill="x", padx=10, pady=5)
+
+        # Product info
+        info_frame = ctk.CTkFrame(card_frame)
+        info_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+
+        # Name and brand
+        name_label = ctk.CTkLabel(
+            info_frame,
+            text=f"{product['name']} - {product['brand']}",
+            font=create_heading_font(16),
+            anchor="w"
+        )
+        name_label.pack(fill="x", padx=10, pady=(10, 5))
+
+        # Details
+        details_text = f"الفئة: {product['category']} | الكمية: {product['quantity']} | السعر: {product['selling_price']:.2f} ريال"
+        details_label = ctk.CTkLabel(
+            info_frame,
+            text=details_text,
+            font=create_body_font(12),
+            anchor="w"
+        )
+        details_label.pack(fill="x", padx=10, pady=(0, 10))
+
+        # Buttons frame
+        buttons_frame = ctk.CTkFrame(card_frame)
+        buttons_frame.pack(side="right", padx=10, pady=10)
+
+        edit_button = ctk.CTkButton(
+            buttons_frame,
+            text="تعديل",
+            command=lambda p=product: self.edit_product(p),
+            width=80,
+            height=30
+        )
+        edit_button.pack(padx=5, pady=2)
+
+        delete_button = ctk.CTkButton(
+            buttons_frame,
+            text="حذف",
+            command=lambda p=product: self.delete_product(p),
+            width=80,
+            height=30,
+            fg_color="red",
+            hover_color="darkred"
+        )
+        delete_button.pack(padx=5, pady=2)
+
+    def add_product(self):
+        """Add new product"""
+        messagebox.showinfo("قريباً", "ستتم إضافة نافذة إضافة المنتجات قريباً")
+
+    def edit_product(self, product):
+        """Edit product"""
+        messagebox.showinfo("قريباً", f"ستتم إضافة نافذة تعديل المنتج: {product['name']}")
+
+    def delete_product(self, product):
+        """Delete product"""
+        if messagebox.askyesno("تأكيد الحذف", f"هل تريد حذف المنتج: {product['name']}؟"):
+            try:
+                self.db_manager.delete_product(product['id'])
+                self.load_products()
+                messagebox.showinfo("نجح", "تم حذف المنتج بنجاح")
+            except Exception as e:
+                messagebox.showerror("خطأ", f"حدث خطأ في حذف المنتج: {e}")
+
+    def search_products(self):
+        """Search products"""
+        search_term = self.search_entry.get().strip()
+        if not search_term:
+            self.load_products()
+            return
+
+        try:
+            # Simple search implementation
+            all_products = self.db_manager.get_all_products()
+            filtered_products = [
+                product for product in all_products
+                if search_term.lower() in product['name'].lower() or
+                   search_term.lower() in product['brand'].lower()
+            ]
+
+            # Clear existing widgets
+            for widget in self.products_frame.winfo_children():
+                widget.destroy()
+
+            if not filtered_products:
+                no_results_label = ctk.CTkLabel(
+                    self.products_frame,
+                    text=f"لا توجد نتائج للبحث: {search_term}",
+                    font=create_body_font(14)
+                )
+                no_results_label.pack(pady=50)
+            else:
+                for product in filtered_products:
+                    self.create_product_card(product)
+
+        except Exception as e:
+            messagebox.showerror("خطأ", f"حدث خطأ في البحث: {e}")

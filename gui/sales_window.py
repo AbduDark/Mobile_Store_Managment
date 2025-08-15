@@ -606,3 +606,159 @@ class SalesWindow(ctk.CTkFrame):
                 filtered_products.append(product)
         
         self.display_products(filtered_products)
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Sales Window for Mobile Shop Management System
+نافذة المبيعات لنظام إدارة محل الموبايلات
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox
+import sys
+import os
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
+
+class SalesWindow(ctk.CTkFrame):
+    """Sales management window"""
+
+    def __init__(self, parent, db_manager):
+        super().__init__(parent)
+        self.db_manager = db_manager
+        self.create_widgets()
+        self.load_sales()
+
+    def create_widgets(self):
+        """Create the sales interface"""
+        # Title
+        self.title_label = ctk.CTkLabel(
+            self,
+            text="إدارة المبيعات",
+            font=create_title_font(28)
+        )
+        self.title_label.pack(pady=(0, 20))
+
+        # Controls frame
+        self.controls_frame = ctk.CTkFrame(self)
+        self.controls_frame.pack(fill="x", padx=20, pady=(0, 20))
+
+        # New sale button
+        self.new_sale_button = ctk.CTkButton(
+            self.controls_frame,
+            text="بيعة جديدة",
+            command=self.new_sale,
+            font=create_button_font(14),
+            width=150,
+            height=40
+        )
+        self.new_sale_button.pack(side="left", padx=10, pady=10)
+
+        # Sales stats frame
+        self.stats_frame = ctk.CTkFrame(self.controls_frame)
+        self.stats_frame.pack(side="right", padx=10, pady=10)
+
+        # Today's sales
+        self.today_sales_label = ctk.CTkLabel(
+            self.stats_frame,
+            text="مبيعات اليوم: 0.00 ريال",
+            font=create_body_font(12)
+        )
+        self.today_sales_label.pack(padx=10, pady=5)
+
+        # Sales list
+        self.sales_frame = ctk.CTkScrollableFrame(self, label_text="سجل المبيعات")
+        self.sales_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+
+    def load_sales(self):
+        """Load sales from database"""
+        try:
+            # Get recent sales (last 30 days)
+            from datetime import datetime, timedelta
+            end_date = datetime.now().strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            
+            sales = self.db_manager.get_sales_report(start_date, end_date)
+            
+            # Clear existing widgets
+            for widget in self.sales_frame.winfo_children():
+                widget.destroy()
+
+            if not sales:
+                no_sales_label = ctk.CTkLabel(
+                    self.sales_frame,
+                    text="لا توجد مبيعات حتى الآن. انقر على 'بيعة جديدة' لإضافة أول عملية بيع.",
+                    font=create_body_font(14)
+                )
+                no_sales_label.pack(pady=50)
+                return
+
+            # Create sales cards
+            for sale in sales:
+                self.create_sale_card(sale)
+
+            # Update stats
+            self.update_stats()
+
+        except Exception as e:
+            messagebox.showerror("خطأ", f"حدث خطأ في تحميل المبيعات: {e}")
+
+    def create_sale_card(self, sale):
+        """Create a sale card widget"""
+        card_frame = ctk.CTkFrame(self.sales_frame)
+        card_frame.pack(fill="x", padx=10, pady=5)
+
+        # Sale info
+        info_frame = ctk.CTkFrame(card_frame)
+        info_frame.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+
+        # Sale number and date
+        header_text = f"فاتورة رقم: {sale['id']} - {sale['sale_date'][:10]}"
+        header_label = ctk.CTkLabel(
+            info_frame,
+            text=header_text,
+            font=create_heading_font(14),
+            anchor="w"
+        )
+        header_label.pack(fill="x", padx=10, pady=(10, 5))
+
+        # Details
+        customer_name = sale.get('customer_name', 'عميل عادي')
+        details_text = f"العميل: {customer_name} | المبلغ: {sale['total_amount']:.2f} ريال | الدفع: {sale['payment_method']}"
+        details_label = ctk.CTkLabel(
+            info_frame,
+            text=details_text,
+            font=create_body_font(12),
+            anchor="w"
+        )
+        details_label.pack(fill="x", padx=10, pady=(0, 10))
+
+        # View button
+        view_button = ctk.CTkButton(
+            card_frame,
+            text="عرض التفاصيل",
+            command=lambda s=sale: self.view_sale_details(s),
+            width=120,
+            height=40
+        )
+        view_button.pack(side="right", padx=10, pady=10)
+
+    def update_stats(self):
+        """Update sales statistics"""
+        try:
+            stats = self.db_manager.get_dashboard_stats()
+            today_total = stats.get('today_sales_total', 0)
+            self.today_sales_label.configure(text=f"مبيعات اليوم: {today_total:.2f} ريال")
+        except Exception as e:
+            print(f"خطأ في تحديث الإحصائيات: {e}")
+
+    def new_sale(self):
+        """Create new sale"""
+        messagebox.showinfo("قريباً", "ستتم إضافة نافذة البيع قريباً")
+
+    def view_sale_details(self, sale):
+        """View sale details"""
+        messagebox.showinfo("تفاصيل البيعة", f"تفاصيل الفاتورة رقم: {sale['id']}\nالمبلغ: {sale['total_amount']:.2f} ريال")

@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -30,18 +29,18 @@ class ArabicFontManager:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
         fonts_dir = os.path.join(project_root, "fonts")
-        
+
         # Check for exact file name
         font_path = os.path.join(fonts_dir, font_name)
         if os.path.exists(font_path):
             return font_path
-        
+
         # Check for font name with extensions
         for ext in ['.ttf', '.otf', '.TTF', '.OTF']:
             font_path = os.path.join(fonts_dir, f"{font_name}{ext}")
             if os.path.exists(font_path):
                 return font_path
-        
+
         return None
 
     def _load_custom_fonts(self):
@@ -50,7 +49,7 @@ class ArabicFontManager:
             # Get specific font paths
             self.primary_font_path = self._get_font_path('Hacen-Tunisia.ttf')
             self.secondary_font_path = self._get_font_path('Ya-ModernPro-Bold.otf')
-            
+
             if self.primary_font_path:
                 # Register font for Windows if needed
                 if platform.system() == "Windows":
@@ -59,12 +58,12 @@ class ArabicFontManager:
                         ctypes.windll.gdi32.AddFontResourceW(self.primary_font_path)
                     except:
                         pass
-                
+
                 # Extract font name for reference
                 self.primary_font_name = "Hacen-Tunisia"
                 print(f"تم تحديد الخط الأساسي: {self.primary_font_name}")
                 print(f"مسار الخط: {self.primary_font_path}")
-            
+
             if self.secondary_font_path:
                 # Register font for Windows if needed
                 if platform.system() == "Windows":
@@ -73,7 +72,7 @@ class ArabicFontManager:
                         ctypes.windll.gdi32.AddFontResourceW(self.secondary_font_path)
                     except:
                         pass
-                
+
                 # Extract font name for reference
                 self.secondary_font_name = "Ya-ModernPro-Bold"
                 print(f"تم تحديد الخط الفرعي: {self.secondary_font_name}")
@@ -170,21 +169,58 @@ def create_arabic_font(size: int = 12, weight: str = "normal", is_title: bool = 
     else:
         return font_manager.get_secondary_font(size, weight)
 
-def create_title_font(size: int = 24) -> ctk.CTkFont:
-    """Create font for titles"""
-    return create_arabic_font(size, "bold", True)
+def create_title_font(size=24):
+    """Create title font for Arabic text"""
+    try:
+        font_manager = get_font_manager()
+        return ctk.CTkFont(
+            family=font_manager.primary_font,
+            size=size,
+            weight="bold"
+        )
+    except Exception as e:
+        print(f"خطأ في إنشاء خط العنوان: {e}")
+        return ctk.CTkFont(size=size, weight="bold")
 
-def create_heading_font(size: int = 18) -> ctk.CTkFont:
-    """Create font for headings"""
-    return create_arabic_font(size, "bold", True)
+def create_heading_font(size=18):
+    """Create heading font for Arabic text"""
+    try:
+        font_manager = get_font_manager()
+        return ctk.CTkFont(
+            family=font_manager.primary_font,
+            size=size,
+            weight="bold"
+        )
+    except Exception as e:
+        print(f"خطأ في إنشاء خط العنوان الفرعي: {e}")
+        return ctk.CTkFont(size=size, weight="bold")
 
-def create_body_font(size: int = 12) -> ctk.CTkFont:
-    """Create font for body text"""
-    return create_arabic_font(size, "normal", False)
+def create_body_font(size=12):
+    """Create body font for Arabic text"""
+    try:
+        font_manager = get_font_manager()
+        return ctk.CTkFont(
+            family=font_manager.primary_font,
+            size=size,
+            weight="normal"
+        )
+    except Exception as e:
+        print(f"خطأ في إنشاء خط النص: {e}")
+        return ctk.CTkFont(size=size, weight="normal")
 
-def create_button_font(size: int = 14) -> ctk.CTkFont:
-    """Create font for buttons"""
-    return create_arabic_font(size, "normal", False)
+def create_button_font(size=14):
+    """Create button font for Arabic text"""
+    try:
+        font_manager = get_font_manager()
+        return ctk.CTkFont(
+            family=font_manager.primary_font,
+            size=size,
+            weight="normal"
+        )
+    except Exception as e:
+        print(f"خطأ في إنشاء خط الأزرار: {e}")
+        return ctk.CTkFont(size=size, weight="normal")
+
 
 def format_arabic_text(text: str, max_length: int = None) -> str:
     """Format Arabic text for display"""

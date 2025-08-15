@@ -438,7 +438,15 @@ class ReportsWindow(ctk.CTkFrame):
         sales_data = self.db_manager.get_sales_report(start_date, end_date)
 
         # Calculate summary statistics with None value handling
-        total_sales = sum(float(sale['total_amount'] or 0) for sale in sales_data)
+        total_sales = 0
+        for sale in sales_data:
+            amount = sale.get('total_amount')
+            if amount is not None:
+                try:
+                    total_sales += float(amount)
+                except (ValueError, TypeError):
+                    continue
+        
         total_transactions = len(sales_data)
         avg_transaction = total_sales / total_transactions if total_transactions > 0 else 0
 
@@ -505,8 +513,16 @@ class ReportsWindow(ctk.CTkFrame):
         ax.set_facecolor('none')
 
         if daily_sales:
-            dates = [datetime.strptime(row['sale_day'], '%Y-%m-%d') for row in daily_sales]
-            amounts = [float(row['daily_total'] or 0) for row in daily_sales]
+            dates = []
+            amounts = []
+            for row in daily_sales:
+                try:
+                    dates.append(datetime.strptime(row['sale_day'], '%Y-%m-%d'))
+                    amount = row.get('daily_total', 0)
+                    amounts.append(float(amount) if amount is not None else 0)
+                except (ValueError, TypeError) as e:
+                    print(f"خطأ في معالجة البيانات: {e}")
+                    continue
 
             ax.plot(dates, amounts, marker='o', linewidth=2, markersize=4)
             ax.fill_between(dates, amounts, alpha=0.3)

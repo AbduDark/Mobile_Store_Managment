@@ -168,11 +168,62 @@ class DatabaseManager:
             conn.commit()
             print("تم إنشاء جداول قاعدة البيانات بنجاح")
             
+            # Add sample data if tables are empty
+            self.add_sample_data_if_needed(conn)
+            
         except sqlite3.Error as e:
             print(f"خطأ في إنشاء جداول قاعدة البيانات: {e}")
             conn.rollback()
         finally:
             conn.close()
+    
+    def add_sample_data_if_needed(self, conn):
+        """Add sample data if database is empty"""
+        try:
+            cursor = conn.cursor()
+            
+            # Check if we have any products
+            cursor.execute("SELECT COUNT(*) FROM products")
+            product_count = cursor.fetchone()[0]
+            
+            if product_count == 0:
+                print("إضافة بيانات تجريبية...")
+                
+                # Add sample products
+                sample_products = [
+                    ("iPhone 15 Pro", "Apple", "iPhone 15 Pro", "هواتف ذكية جديدة", 4500, 5200, 10, 2, "", "أحدث هاتف من آبل", "أسود", "256GB", "جديد", ""),
+                    ("Galaxy S24", "Samsung", "Galaxy S24", "هواتف ذكية جديدة", 3200, 3800, 8, 2, "", "هاتف سامسونج الرائد", "أزرق", "128GB", "جديد", ""),
+                    ("iPhone 13", "Apple", "iPhone 13", "هواتف مستعملة", 2800, 3200, 5, 1, "", "آيفون 13 حالة ممتازة", "أبيض", "128GB", "مستعمل ممتاز", ""),
+                    ("شاحن لاسلكي", "Anker", "PowerWave", "إكسسوارات", 120, 180, 15, 3, "", "شاحن لاسلكي سريع", "أسود", "", "جديد", ""),
+                    ("جراب حماية", "OtterBox", "Defender", "إكسسوارات", 80, 150, 20, 5, "", "جراب حماية قوي", "شفاف", "", "جديد", "")
+                ]
+                
+                for product in sample_products:
+                    cursor.execute('''
+                        INSERT INTO products (name, brand, model, category, purchase_price, 
+                                            selling_price, quantity, min_quantity, barcode, 
+                                            description, color, storage, condition, image_path)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', product)
+                
+                # Add sample customers
+                sample_customers = [
+                    ("أحمد محمد", "0501234567", "ahmed@email.com", "الرياض", ""),
+                    ("فاطمة علي", "0507654321", "fatima@email.com", "جدة", ""),
+                    ("محمد السعد", "0551234567", "", "الدمام", "عميل مميز")
+                ]
+                
+                for customer in sample_customers:
+                    cursor.execute('''
+                        INSERT INTO customers (name, phone, email, address, notes)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', customer)
+                
+                conn.commit()
+                print("تم إضافة البيانات التجريبية بنجاح")
+                
+        except sqlite3.Error as e:
+            print(f"خطأ في إضافة البيانات التجريبية: {e}")
     
     def execute_query(self, query: str, params: tuple = ()) -> List[Dict]:
         """Execute a SELECT query and return results"""
