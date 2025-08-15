@@ -326,3 +326,151 @@ class DashboardView(ctk.CTkFrame):
     def refresh_data(self):
         """Refresh dashboard data"""
         self._load_data()
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Dashboard View
+عرض لوحة التحكم
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from datetime import datetime, timedelta
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+class DashboardView(ctk.CTkFrame):
+    """Dashboard view with statistics and charts"""
+    
+    def __init__(self, parent, db_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.db_manager = db_manager
+        self.theme_manager = theme_manager
+        
+        # Configure grid
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        
+        self._create_widgets()
+        self._load_dashboard_data()
+    
+    def _create_widgets(self):
+        """Create dashboard widgets"""
+        # Title
+        title_label = ctk.CTkLabel(
+            self,
+            text="لوحة التحكم الرئيسية",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20), sticky="ew")
+        
+        # Statistics cards frame
+        stats_frame = ctk.CTkFrame(self)
+        stats_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        stats_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
+        
+        # Statistics cards
+        self.stats_cards = {}
+        stats_data = [
+            ("إجمالي المنتجات", "total_products", "#3b82f6"),
+            ("إجمالي العملاء", "total_customers", "#10b981"), 
+            ("مبيعات اليوم", "today_sales", "#f59e0b"),
+            ("مخزون منخفض", "low_stock", "#ef4444")
+        ]
+        
+        for i, (title, key, color) in enumerate(stats_data):
+            card = self._create_stat_card(stats_frame, title, "0", color)
+            card.grid(row=0, column=i, padx=10, pady=10, sticky="ew")
+            self.stats_cards[key] = card
+        
+        # Charts frame
+        charts_frame = ctk.CTkFrame(self)
+        charts_frame.grid(row=2, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
+        charts_frame.grid_columnconfigure(0, weight=1)
+        charts_frame.grid_rowconfigure(0, weight=1)
+        
+        # Create placeholder chart
+        self._create_chart(charts_frame)
+    
+    def _create_stat_card(self, parent, title, value, color):
+        """Create a statistics card"""
+        card = ctk.CTkFrame(parent)
+        
+        # Title
+        title_label = ctk.CTkLabel(
+            card,
+            text=title,
+            font=ctk.CTkFont(size=14, weight="bold")
+        )
+        title_label.pack(pady=(10, 5))
+        
+        # Value
+        value_label = ctk.CTkLabel(
+            card,
+            text=value,
+            font=ctk.CTkFont(size=28, weight="bold"),
+            text_color=color
+        )
+        value_label.pack(pady=(0, 10))
+        
+        # Store value label for updates
+        card.value_label = value_label
+        
+        return card
+    
+    def _create_chart(self, parent):
+        """Create a sample chart"""
+        try:
+            # Create figure
+            fig, ax = plt.subplots(figsize=(10, 6))
+            fig.patch.set_facecolor('#2b2b2b' if self.theme_manager.current_theme == "dark" else 'white')
+            ax.set_facecolor('#2b2b2b' if self.theme_manager.current_theme == "dark" else 'white')
+            
+            # Sample data
+            days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+            sales = [10, 15, 12, 20, 18, 25, 22]
+            
+            ax.bar(days, sales, color='#3b82f6')
+            ax.set_title('مبيعات الأسبوع', color='white' if self.theme_manager.current_theme == "dark" else 'black')
+            ax.set_ylabel('عدد المبيعات', color='white' if self.theme_manager.current_theme == "dark" else 'black')
+            
+            # Style axes
+            ax.tick_params(colors='white' if self.theme_manager.current_theme == "dark" else 'black')
+            
+            # Add to tkinter
+            canvas = FigureCanvasTkAgg(fig, parent)
+            canvas.draw()
+            canvas.get_tk_widget().pack(fill="both", expand=True, padx=10, pady=10)
+            
+        except Exception as e:
+            logger.error(f"Error creating chart: {e}")
+            error_label = ctk.CTkLabel(parent, text="خطأ في تحميل الرسم البياني")
+            error_label.pack(expand=True)
+    
+    def _load_dashboard_data(self):
+        """Load dashboard statistics"""
+        try:
+            stats = self.db_manager.get_dashboard_stats()
+            
+            # Update stat cards
+            if "total_products" in self.stats_cards:
+                self.stats_cards["total_products"].value_label.configure(text=str(stats['total_products']))
+            
+            if "total_customers" in self.stats_cards:
+                self.stats_cards["total_customers"].value_label.configure(text=str(stats['total_customers']))
+            
+            if "today_sales" in self.stats_cards:
+                self.stats_cards["today_sales"].value_label.configure(text=str(stats['today_sales']))
+            
+            if "low_stock" in self.stats_cards:
+                self.stats_cards["low_stock"].value_label.configure(text=str(stats['low_stock']))
+                
+        except Exception as e:
+            logger.error(f"Error loading dashboard data: {e}")
+            messagebox.showerror("خطأ", f"خطأ في تحميل بيانات لوحة التحكم: {e}")

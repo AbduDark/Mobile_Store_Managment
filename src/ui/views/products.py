@@ -280,3 +280,45 @@ class ProductsView(ctk.CTkFrame):
     def _on_product_double_click(self, event):
         """Handle product double click"""
         self._edit_selected_product()
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Products View
+عرض المنتجات
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+class ProductsView(ctk.CTkFrame):
+    """Products management view"""
+    
+    def __init__(self, parent, db_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.db_manager = db_manager
+        self.theme_manager = theme_manager
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create products view widgets"""
+        # Title
+        title_label = ctk.CTkLabel(
+            self,
+            text="إدارة المنتجات",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.pack(pady=(0, 20))
+        
+        # Placeholder content
+        info_label = ctk.CTkLabel(
+            self,
+            text="صفحة إدارة المنتجات قيد التطوير...",
+            font=ctk.CTkFont(size=16)
+        )
+        info_label.pack(expand=True)

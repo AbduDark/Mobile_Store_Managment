@@ -213,3 +213,54 @@ class SettingsView(ctk.CTkFrame):
             
         except Exception as e:
             messagebox.showerror("خطأ", f"حدث خطأ في حفظ الإعدادات: {e}")
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Settings View
+عرض الإعدادات
+"""
+
+import customtkinter as ctk
+from tkinter import messagebox
+
+class SettingsView(ctk.CTkFrame):
+    """Settings view"""
+    
+    def __init__(self, parent, settings_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.settings_manager = settings_manager
+        self.theme_manager = theme_manager
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create settings view widgets"""
+        title_label = ctk.CTkLabel(
+            self,
+            text="إعدادات التطبيق",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.pack(pady=(0, 20))
+        
+        # Theme settings
+        theme_frame = ctk.CTkFrame(self)
+        theme_frame.pack(fill="x", padx=20, pady=10)
+        
+        theme_label = ctk.CTkLabel(theme_frame, text="المظهر:")
+        theme_label.pack(side="left", padx=20, pady=20)
+        
+        theme_switch = ctk.CTkSwitch(
+            theme_frame,
+            text="المظهر الداكن",
+            command=self._toggle_theme
+        )
+        theme_switch.pack(side="right", padx=20, pady=20)
+        
+        if self.theme_manager.current_theme == "dark":
+            theme_switch.select()
+    
+    def _toggle_theme(self):
+        """Toggle theme"""
+        self.theme_manager.toggle_theme()
+        messagebox.showinfo("تم التغيير", "تم تغيير المظهر بنجاح")

@@ -215,3 +215,38 @@ class SalesView(ctk.CTkFrame):
         """Clear the shopping cart"""
         if messagebox.askyesno("تأكيد المسح", "هل تريد مسح جميع المنتجات من السلة؟"):
             messagebox.showinfo("قريباً", "مسح السلة قيد التطوير")
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Sales View
+عرض المبيعات
+"""
+
+import customtkinter as ctk
+
+class SalesView(ctk.CTkFrame):
+    """Sales management view"""
+    
+    def __init__(self, parent, db_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.db_manager = db_manager
+        self.theme_manager = theme_manager
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create sales view widgets"""
+        title_label = ctk.CTkLabel(
+            self,
+            text="إدارة المبيعات",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.pack(pady=(0, 20))
+        
+        info_label = ctk.CTkLabel(
+            self,
+            text="صفحة إدارة المبيعات قيد التطوير...",
+            font=ctk.CTkFont(size=16)
+        )
+        info_label.pack(expand=True)

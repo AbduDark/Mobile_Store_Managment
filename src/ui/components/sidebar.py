@@ -124,3 +124,86 @@ class Sidebar(ctk.CTkFrame):
                     hover_color=colors["bg_tertiary"],
                     text_color=colors["text_primary"]
                 )
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Sidebar Component
+شريط جانبي
+"""
+
+import customtkinter as ctk
+from typing import Callable
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+class Sidebar(ctk.CTkFrame):
+    """Application sidebar with navigation"""
+    
+    def __init__(self, parent, on_view_change: Callable, theme_manager):
+        super().__init__(parent, width=250, corner_radius=0)
+        
+        self.on_view_change = on_view_change
+        self.theme_manager = theme_manager
+        self.active_button = None
+        
+        # Configure grid
+        self.grid_rowconfigure(7, weight=1)
+        
+        # Create navigation buttons
+        self._create_navigation()
+    
+    def _create_navigation(self):
+        """Create navigation buttons"""
+        # Logo/Title
+        logo_label = ctk.CTkLabel(
+            self,
+            text="المحل الذكي",
+            font=ctk.CTkFont(size=20, weight="bold")
+        )
+        logo_label.grid(row=0, column=0, padx=20, pady=(20, 30))
+        
+        # Navigation buttons
+        nav_items = [
+            ("🏠 لوحة التحكم", "dashboard"),
+            ("📱 المنتجات", "products"),
+            ("💰 المبيعات", "sales"),
+            ("👥 العملاء", "customers"),
+            ("📊 التقارير", "reports"),
+            ("⚙️ الإعدادات", "settings")
+        ]
+        
+        self.nav_buttons = {}
+        
+        for i, (text, view_name) in enumerate(nav_items, 1):
+            button = ctk.CTkButton(
+                self,
+                text=text,
+                height=40,
+                font=ctk.CTkFont(size=14),
+                anchor="w",
+                command=lambda v=view_name: self._navigate_to(v)
+            )
+            button.grid(row=i, column=0, sticky="ew", padx=20, pady=5)
+            
+            self.nav_buttons[view_name] = button
+    
+    def _navigate_to(self, view_name: str):
+        """Navigate to a view"""
+        try:
+            self.on_view_change(view_name)
+            logger.info(f"Navigated to: {view_name}")
+        except Exception as e:
+            logger.error(f"Error navigating to {view_name}: {e}")
+    
+    def set_active_button(self, view_name: str):
+        """Set active navigation button"""
+        # Reset all buttons
+        for button in self.nav_buttons.values():
+            button.configure(fg_color=("gray75", "gray25"))
+        
+        # Highlight active button
+        if view_name in self.nav_buttons:
+            self.nav_buttons[view_name].configure(fg_color=("#3b82f6", "#1f538d"))
+            self.active_button = view_name

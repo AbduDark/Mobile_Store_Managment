@@ -115,3 +115,38 @@ class ReportsView(ctk.CTkFrame):
     def _generate_report(self, report_type):
         """Generate the selected report"""
         messagebox.showinfo("قريباً", f"تقرير {report_type} قيد التطوير")
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Reports View
+عرض التقارير
+"""
+
+import customtkinter as ctk
+
+class ReportsView(ctk.CTkFrame):
+    """Reports view"""
+    
+    def __init__(self, parent, db_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.db_manager = db_manager
+        self.theme_manager = theme_manager
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create reports view widgets"""
+        title_label = ctk.CTkLabel(
+            self,
+            text="التقارير والإحصائيات",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.pack(pady=(0, 20))
+        
+        info_label = ctk.CTkLabel(
+            self,
+            text="صفحة التقارير قيد التطوير...",
+            font=ctk.CTkFont(size=16)
+        )
+        info_label.pack(expand=True)

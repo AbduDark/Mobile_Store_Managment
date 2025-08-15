@@ -461,3 +461,270 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {e}")
             return {}
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Database Manager
+مدير قاعدة البيانات
+"""
+
+import sqlite3
+import os
+from pathlib import Path
+from datetime import datetime, date
+from typing import List, Dict, Optional, Any
+from dataclasses import dataclass
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+@dataclass
+class Product:
+    """Product data model"""
+    id: Optional[int] = None
+    name: str = ""
+    brand: str = ""
+    model: str = ""
+    price: float = 0.0
+    cost: float = 0.0
+    quantity: int = 0
+    category: str = ""
+    description: str = ""
+    image_path: str = ""
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class Customer:
+    """Customer data model"""
+    id: Optional[int] = None
+    name: str = ""
+    phone: str = ""
+    email: str = ""
+    address: str = ""
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class Sale:
+    """Sale data model"""
+    id: Optional[int] = None
+    customer_id: Optional[int] = None
+    product_id: int = 0
+    quantity: int = 1
+    unit_price: float = 0.0
+    total_price: float = 0.0
+    discount: float = 0.0
+    tax: float = 0.0
+    sale_date: Optional[datetime] = None
+    payment_method: str = "cash"
+    notes: str = ""
+
+class DatabaseManager:
+    """Database operations manager"""
+    
+    def __init__(self, db_path: str = "data/database/shop.db"):
+        """Initialize database manager"""
+        self.db_path = db_path
+        self.connection = None
+        
+        # Ensure database directory exists
+        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        self._initialize_database()
+    
+    def _initialize_database(self):
+        """Initialize database connection and create tables"""
+        try:
+            self.connection = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.connection.row_factory = sqlite3.Row
+            
+            self._create_tables()
+            logger.info("Database initialized successfully")
+            
+        except Exception as e:
+            logger.error(f"Error initializing database: {e}")
+            raise
+    
+    def _create_tables(self):
+        """Create database tables"""
+        cursor = self.connection.cursor()
+        
+        # Products table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                brand TEXT,
+                model TEXT,
+                price REAL NOT NULL,
+                cost REAL,
+                quantity INTEGER DEFAULT 0,
+                category TEXT,
+                description TEXT,
+                image_path TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        # Customers table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS customers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT,
+                email TEXT,
+                address TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        # Sales table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS sales (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER,
+                product_id INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
+                unit_price REAL NOT NULL,
+                total_price REAL NOT NULL,
+                discount REAL DEFAULT 0,
+                tax REAL DEFAULT 0,
+                sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                payment_method TEXT DEFAULT 'cash',
+                notes TEXT,
+                FOREIGN KEY (customer_id) REFERENCES customers (id),
+                FOREIGN KEY (product_id) REFERENCES products (id)
+            )
+        """)
+        
+        self.connection.commit()
+        logger.info("Database tables created successfully")
+    
+    def add_product(self, product: Product) -> int:
+        """Add a new product"""
+        cursor = self.connection.cursor()
+        cursor.execute("""
+            INSERT INTO products (name, brand, model, price, cost, quantity, category, description, image_path)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            product.name, product.brand, product.model, product.price,
+            product.cost, product.quantity, product.category, product.description, product.image_path
+        ))
+        self.connection.commit()
+        return cursor.lastrowid
+    
+    def get_products(self) -> List[Product]:
+        """Get all products"""
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM products ORDER BY name")
+        rows = cursor.fetchall()
+        
+        return [Product(
+            id=row['id'],
+            name=row['name'],
+            brand=row['brand'],
+            model=row['model'],
+            price=row['price'],
+            cost=row['cost'],
+            quantity=row['quantity'],
+            category=row['category'],
+            description=row['description'],
+            image_path=row['image_path'],
+            created_at=row['created_at'],
+            updated_at=row['updated_at']
+        ) for row in rows]
+    
+    def add_customer(self, customer: Customer) -> int:
+        """Add a new customer"""
+        cursor = self.connection.cursor()
+        cursor.execute("""
+            INSERT INTO customers (name, phone, email, address)
+            VALUES (?, ?, ?, ?)
+        """, (customer.name, customer.phone, customer.email, customer.address))
+        self.connection.commit()
+        return cursor.lastrowid
+    
+    def get_customers(self) -> List[Customer]:
+        """Get all customers"""
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM customers ORDER BY name")
+        rows = cursor.fetchall()
+        
+        return [Customer(
+            id=row['id'],
+            name=row['name'],
+            phone=row['phone'],
+            email=row['email'],
+            address=row['address'],
+            created_at=row['created_at'],
+            updated_at=row['updated_at']
+        ) for row in rows]
+    
+    def add_sale(self, sale: Sale) -> int:
+        """Add a new sale"""
+        cursor = self.connection.cursor()
+        cursor.execute("""
+            INSERT INTO sales (customer_id, product_id, quantity, unit_price, total_price, discount, tax, payment_method, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            sale.customer_id, sale.product_id, sale.quantity, sale.unit_price,
+            sale.total_price, sale.discount, sale.tax, sale.payment_method, sale.notes
+        ))
+        self.connection.commit()
+        return cursor.lastrowid
+    
+    def get_sales(self, limit: int = 100) -> List[Dict]:
+        """Get recent sales with product and customer info"""
+        cursor = self.connection.cursor()
+        cursor.execute("""
+            SELECT s.*, p.name as product_name, c.name as customer_name
+            FROM sales s
+            LEFT JOIN products p ON s.product_id = p.id
+            LEFT JOIN customers c ON s.customer_id = c.id
+            ORDER BY s.sale_date DESC
+            LIMIT ?
+        """, (limit,))
+        
+        return [dict(row) for row in cursor.fetchall()]
+    
+    def get_dashboard_stats(self) -> Dict[str, Any]:
+        """Get dashboard statistics"""
+        cursor = self.connection.cursor()
+        
+        # Total products
+        cursor.execute("SELECT COUNT(*) as count FROM products")
+        total_products = cursor.fetchone()['count']
+        
+        # Total customers
+        cursor.execute("SELECT COUNT(*) as count FROM customers")
+        total_customers = cursor.fetchone()['count']
+        
+        # Today's sales
+        cursor.execute("""
+            SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as revenue
+            FROM sales 
+            WHERE DATE(sale_date) = DATE('now')
+        """)
+        today_stats = cursor.fetchone()
+        
+        # Low stock products
+        cursor.execute("SELECT COUNT(*) as count FROM products WHERE quantity < 10")
+        low_stock = cursor.fetchone()['count']
+        
+        return {
+            'total_products': total_products,
+            'total_customers': total_customers,
+            'today_sales': today_stats['count'],
+            'today_revenue': today_stats['revenue'],
+            'low_stock': low_stock
+        }
+    
+    def close(self):
+        """Close database connection"""
+        if self.connection:
+            self.connection.close()
+            logger.info("Database connection closed")

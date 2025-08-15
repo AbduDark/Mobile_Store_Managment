@@ -51,3 +51,32 @@ def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
         logger.warning(f"Could not create file handler: {e}")
     
     return logger
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Logger Utility
+أداة السجلات
+"""
+
+import logging
+import os
+from pathlib import Path
+
+def setup_logger():
+    """Setup main application logger"""
+    # Create logs directory
+    Path("logs").mkdir(exist_ok=True)
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('logs/app.log', encoding='utf-8'),
+            logging.StreamHandler()
+        ]
+    )
+
+def get_logger(name: str) -> logging.Logger:
+    """Get logger instance"""
+    return logging.getLogger(name)

@@ -251,3 +251,38 @@ class CustomersView(ctk.CTkFrame):
     def _on_customer_double_click(self, event):
         """Handle customer double click"""
         self._show_customer_details()
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Customers View
+عرض العملاء
+"""
+
+import customtkinter as ctk
+
+class CustomersView(ctk.CTkFrame):
+    """Customers management view"""
+    
+    def __init__(self, parent, db_manager, theme_manager):
+        super().__init__(parent)
+        
+        self.db_manager = db_manager
+        self.theme_manager = theme_manager
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create customers view widgets"""
+        title_label = ctk.CTkLabel(
+            self,
+            text="إدارة العملاء",
+            font=ctk.CTkFont(size=24, weight="bold")
+        )
+        title_label.pack(pady=(0, 20))
+        
+        info_label = ctk.CTkLabel(
+            self,
+            text="صفحة إدارة العملاء قيد التطوير...",
+            font=ctk.CTkFont(size=16)
+        )
+        info_label.pack(expand=True)
