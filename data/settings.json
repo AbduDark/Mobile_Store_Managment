@@ -1,0 +1,15 @@
+{
+  "shop_name": "المحل الذكي",
+  "shop_address": "",
+  "shop_phone": "",
+  "shop_email": "",
+  "theme": "dark",
+  "language": "ar",
+  "font_size": 12,
+  "currency": "ريال",
+  "tax_rate": 0.15,
+  "default_discount": 0.0,
+  "backup_enabled": true,
+  "auto_backup_days": 7,
+  "max_recent_items": 50
+}
