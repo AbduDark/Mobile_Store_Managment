@@ -439,3 +439,34 @@
 2025-08-15 21:17:14,040 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
 2025-08-15 21:17:20,041 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
 2025-08-15 21:17:26,105 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:32,107 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:38,108 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:44,110 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:50,112 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:17:56,113 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:02,114 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:08,116 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:14,117 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:20,122 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:26,124 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:32,126 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:38,128 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:44,135 - src.ui.components.header - ERROR - Error updating clock: main thread is not in main loop
+2025-08-15 21:18:47,598 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
+2025-08-15 21:18:47,599 - __main__ - INFO - Application setup completed successfully
+2025-08-15 21:18:48,294 - src.core.settings - INFO - Settings loaded successfully
+2025-08-15 21:18:48,294 - src.core.settings - INFO - Settings manager initialized
+2025-08-15 21:18:48,294 - src.app - INFO - Settings manager initialized
+2025-08-15 21:18:48,295 - src.core.database - INFO - Database tables created successfully
+2025-08-15 21:18:48,295 - src.core.database - INFO - Database initialized: data/database/shop.db
+2025-08-15 21:18:48,295 - src.app - INFO - Database manager initialized
+2025-08-15 21:18:48,296 - src.core.theme - INFO - Theme manager initialized successfully
+2025-08-15 21:18:48,296 - src.app - INFO - Theme manager initialized
+2025-08-15 21:18:48,436 - src.ui.components.header - INFO - Header bar component initialized
+2025-08-15 21:18:48,501 - src.ui.components.sidebar - INFO - Sidebar component initialized
+2025-08-15 21:18:48,671 - src.core.database - ERROR - Error executing query: no such column: final_amount
+2025-08-15 21:18:48,671 - src.core.database - ERROR - Error executing query: no such column: stock_quantity
+2025-08-15 21:18:48,672 - src.core.database - ERROR - Error executing query: no such column: stock_quantity
+2025-08-15 21:18:48,677 - src.ui.main_window - INFO - Switched to view: dashboard
+2025-08-15 21:18:48,678 - src.ui.main_window - INFO - Main window initialized
+2025-08-15 21:18:48,678 - src.app - INFO - Application started successfully
