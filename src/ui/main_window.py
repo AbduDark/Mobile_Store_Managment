@@ -34,9 +34,20 @@ class MainWindow(ctk.CTk):
         self.theme_manager = theme_manager
         
         # Window configuration
-        self.title("المحل الذكي - Smart Mobile Shop v2.0")
+        self.title(f"{self.settings_manager.shop_info.name} - Smart Mobile Shop v2.0")
         self.geometry("1600x1000")
         self.minsize(1200, 700)
+        
+        # Set window icon if available
+        icon_path = self.theme_manager.get_icon_path("app_icon.png")
+        if icon_path:
+            try:
+                self.iconbitmap(icon_path)
+            except:
+                pass
+        
+        # Configure fonts for Arabic support
+        self._configure_fonts()
         
         # Configure grid weights
         self.grid_columnconfigure(1, weight=1)
@@ -53,6 +64,17 @@ class MainWindow(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         logger.info("Main window initialized")
+    
+    def _configure_fonts(self):
+        """Configure fonts for better Arabic display"""
+        # Set default fonts for CustomTkinter
+        arabic_font = self.theme_manager.get_font_config(12)
+        
+        # Update CustomTkinter default fonts
+        ctk.ThemeManager.theme["CTkLabel"]["text_font"] = arabic_font
+        ctk.ThemeManager.theme["CTkButton"]["text_font"] = arabic_font
+        ctk.ThemeManager.theme["CTkEntry"]["text_font"] = arabic_font
+        ctk.ThemeManager.theme["CTkTextbox"]["text_font"] = arabic_font
     
     def _setup_ui(self):
         """Setup main UI components"""

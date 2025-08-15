@@ -2,144 +2,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Modern Sidebar Component
-شريط جانبي حديث
-"""
-
-import customtkinter as ctk
-from typing import Callable, Optional
-
-class Sidebar(ctk.CTkFrame):
-    """Modern sidebar with navigation buttons"""
-    
-    def __init__(self, parent, on_view_change: Callable, theme_manager):
-        super().__init__(parent, width=250, corner_radius=0)
-        
-        self.on_view_change = on_view_change
-        self.theme_manager = theme_manager
-        self.active_button = None
-        
-        # Prevent frame from shrinking
-        self.grid_propagate(False)
-        
-        # Configure grid
-        self.grid_columnconfigure(0, weight=1)
-        
-        self._setup_ui()
-    
-    def _setup_ui(self):
-        """Setup sidebar UI"""
-        # Logo/Title section
-        title_frame = ctk.CTkFrame(self, fg_color="transparent")
-        title_frame.grid(row=0, column=0, sticky="ew", padx=15, pady=(20, 30))
-        title_frame.grid_columnconfigure(0, weight=1)
-        
-        # App title
-        title_label = ctk.CTkLabel(
-            title_frame,
-            text="المحل الذكي",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color=self.theme_manager.get_colors()["accent"]
-        )
-        title_label.grid(row=0, column=0)
-        
-        # Subtitle
-        subtitle_label = ctk.CTkLabel(
-            title_frame,
-            text="Smart Shop v2.0",
-            font=ctk.CTkFont(size=12),
-            text_color=self.theme_manager.get_colors()["text_secondary"]
-        )
-        subtitle_label.grid(row=1, column=0, pady=(5, 0))
-        
-        # Navigation buttons
-        nav_frame = ctk.CTkFrame(self, fg_color="transparent")
-        nav_frame.grid(row=1, column=0, sticky="ew", padx=15, pady=10)
-        nav_frame.grid_columnconfigure(0, weight=1)
-        
-        # Button configurations
-        buttons_config = [
-            ("dashboard", "🏠 الرئيسية", "Dashboard"),
-            ("products", "📱 المنتجات", "Products"),
-            ("sales", "🛒 المبيعات", "Sales"),
-            ("customers", "👥 العملاء", "Customers"),
-            ("reports", "📊 التقارير", "Reports"),
-            ("settings", "⚙️ الإعدادات", "Settings")
-        ]
-        
-        self.nav_buttons = {}
-        
-        for i, (view_name, text, tooltip) in enumerate(buttons_config):
-            btn = ctk.CTkButton(
-                nav_frame,
-                text=text,
-                height=45,
-                font=ctk.CTkFont(size=14, weight="normal"),
-                corner_radius=8,
-                anchor="w",
-                command=lambda v=view_name: self._on_button_click(v)
-            )
-            btn.grid(row=i, column=0, sticky="ew", pady=5)
-            self.nav_buttons[view_name] = btn
-        
-        # Footer
-        footer_frame = ctk.CTkFrame(self, fg_color="transparent")
-        footer_frame.grid(row=2, column=0, sticky="ews", padx=15, pady=20)
-        footer_frame.grid_columnconfigure(0, weight=1)
-        
-        # Version info
-        version_label = ctk.CTkLabel(
-            footer_frame,
-            text="الإصدار 2.0.0",
-            font=ctk.CTkFont(size=10),
-            text_color=self.theme_manager.get_colors()["text_secondary"]
-        )
-        version_label.grid(row=0, column=0)
-        
-        # Configure row weights
-        self.grid_rowconfigure(1, weight=1)
-    
-    def _on_button_click(self, view_name: str):
-        """Handle button click"""
-        self.on_view_change(view_name)
-    
-    def set_active_button(self, view_name: str):
-        """Set active button visual state"""
-        colors = self.theme_manager.get_colors()
-        
-        # Reset all buttons
-        for btn_name, btn in self.nav_buttons.items():
-            if btn_name == view_name:
-                # Active button
-                btn.configure(
-                    fg_color=colors["accent"],
-                    hover_color=colors["accent_hover"],
-                    text_color="white"
-                )
-                self.active_button = btn
-            else:
-                # Inactive buttons
-                btn.configure(
-                    fg_color="transparent",
-                    hover_color=colors["bg_tertiary"],
-                    text_color=colors["text_primary"]
-                )
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Sidebar Component
 شريط جانبي
 """
 
 import customtkinter as ctk
 from typing import Callable
+from PIL import Image, ImageTk
+from pathlib import Path
 
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 class Sidebar(ctk.CTkFrame):
-    """Application sidebar with navigation"""
+    """Sidebar navigation component"""
     
     def __init__(self, parent, on_view_change: Callable, theme_manager):
         super().__init__(parent, width=250, corner_radius=0)
@@ -149,61 +26,123 @@ class Sidebar(ctk.CTkFrame):
         self.active_button = None
         
         # Configure grid
-        self.grid_rowconfigure(7, weight=1)
+        self.grid_rowconfigure(8, weight=1)  # Spacer
         
-        # Create navigation buttons
+        # Navigation items
+        self.nav_items = [
+            ("dashboard", "لوحة التحكم", "dashboard.png"),
+            ("products", "المنتجات", "products.png"),
+            ("sales", "المبيعات", "sales.png"),
+            ("customers", "العملاء", "customers.png"),
+            ("reports", "التقارير", "reports.png"),
+            ("settings", "الإعدادات", "settings.png")
+        ]
+        
+        self.buttons = {}
         self._create_navigation()
+        
+        logger.info("Sidebar component initialized")
+    
+    def _load_icon(self, icon_name: str, size: tuple = (24, 24)) -> ctk.CTkImage:
+        """Load and resize icon"""
+        try:
+            icon_path = Path(f"assets/icons/{icon_name}")
+            if icon_path.exists():
+                image = Image.open(icon_path)
+                return ctk.CTkImage(light_image=image, dark_image=image, size=size)
+            else:
+                # Return empty image if icon not found
+                return ctk.CTkImage(Image.new('RGBA', size, (0, 0, 0, 0)), size=size)
+        except Exception as e:
+            logger.warning(f"Could not load icon {icon_name}: {e}")
+            return ctk.CTkImage(Image.new('RGBA', size, (0, 0, 0, 0)), size=size)
     
     def _create_navigation(self):
         """Create navigation buttons"""
+        colors = self.theme_manager.get_colors()
+        font = self.theme_manager.get_font_config(14, "bold")
+        
         # Logo/Title
-        logo_label = ctk.CTkLabel(
+        title_label = ctk.CTkLabel(
             self,
             text="المحل الذكي",
-            font=ctk.CTkFont(size=20, weight="bold")
+            font=self.theme_manager.get_font_config(18, "bold"),
+            text_color=colors["accent"]
         )
-        logo_label.grid(row=0, column=0, padx=20, pady=(20, 30))
+        title_label.grid(row=0, column=0, padx=20, pady=(20, 30), sticky="ew")
         
         # Navigation buttons
-        nav_items = [
-            ("🏠 لوحة التحكم", "dashboard"),
-            ("📱 المنتجات", "products"),
-            ("💰 المبيعات", "sales"),
-            ("👥 العملاء", "customers"),
-            ("📊 التقارير", "reports"),
-            ("⚙️ الإعدادات", "settings")
-        ]
-        
-        self.nav_buttons = {}
-        
-        for i, (text, view_name) in enumerate(nav_items, 1):
+        for i, (view_name, label, icon_name) in enumerate(self.nav_items, 1):
+            icon = self._load_icon(icon_name)
+            
             button = ctk.CTkButton(
                 self,
-                text=text,
-                height=40,
-                font=ctk.CTkFont(size=14),
+                text=f"  {label}",
+                image=icon,
+                compound="left",
                 anchor="w",
-                command=lambda v=view_name: self._navigate_to(v)
+                font=font,
+                height=50,
+                fg_color="transparent",
+                text_color=colors["text_secondary"],
+                hover_color=colors["bg_tertiary"],
+                command=lambda v=view_name: self._on_button_click(v)
             )
-            button.grid(row=i, column=0, sticky="ew", padx=20, pady=5)
+            button.grid(row=i, column=0, padx=10, pady=5, sticky="ew")
             
-            self.nav_buttons[view_name] = button
+            self.buttons[view_name] = button
+        
+        # Spacer
+        spacer = ctk.CTkFrame(self, height=1, fg_color="transparent")
+        spacer.grid(row=8, column=0, sticky="ew")
+        
+        # Footer info
+        footer_label = ctk.CTkLabel(
+            self,
+            text="الإصدار 2.0",
+            font=self.theme_manager.get_font_config(10),
+            text_color=colors["text_secondary"]
+        )
+        footer_label.grid(row=9, column=0, padx=20, pady=(10, 20))
     
-    def _navigate_to(self, view_name: str):
-        """Navigate to a view"""
-        try:
-            self.on_view_change(view_name)
-            logger.info(f"Navigated to: {view_name}")
-        except Exception as e:
-            logger.error(f"Error navigating to {view_name}: {e}")
+    def _on_button_click(self, view_name: str):
+        """Handle button click"""
+        self.on_view_change(view_name)
     
     def set_active_button(self, view_name: str):
-        """Set active navigation button"""
-        # Reset all buttons
-        for button in self.nav_buttons.values():
-            button.configure(fg_color=("gray75", "gray25"))
+        """Set active button styling"""
+        colors = self.theme_manager.get_colors()
         
-        # Highlight active button
-        if view_name in self.nav_buttons:
-            self.nav_buttons[view_name].configure(fg_color=("#3b82f6", "#1f538d"))
+        # Reset all buttons
+        for button in self.buttons.values():
+            button.configure(
+                fg_color="transparent",
+                text_color=colors["text_secondary"]
+            )
+        
+        # Set active button
+        if view_name in self.buttons:
+            self.buttons[view_name].configure(
+                fg_color=colors["accent"],
+                text_color=colors["text_primary"]
+            )
             self.active_button = view_name
+    
+    def update_theme(self):
+        """Update theme colors"""
+        colors = self.theme_manager.get_colors()
+        
+        # Update button colors
+        for view_name, button in self.buttons.items():
+            if view_name == self.active_button:
+                button.configure(
+                    fg_color=colors["accent"],
+                    text_color=colors["text_primary"],
+                    hover_color=colors["accent_hover"]
+                )
+            else:
+                button.configure(
+                    fg_color="transparent",
+                    text_color=colors["text_secondary"],
+                    hover_color=colors["bg_tertiary"]
+                )
