@@ -21,6 +21,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         
         # Configure matplotlib for Arabic support
         from utils.font_loader import configure_matplotlib_arabic
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
         configure_matplotlib_arabic()
         
         self.create_widgets()
@@ -32,7 +33,8 @@ class Dashboard(ctk.CTkScrollableFrame):
         self.title_label = ctk.CTkLabel(
             self,
             text="لوحة المعلومات الرئيسية",
-            font=ctk.CTkFont(size=32, weight="bold")
+            font=create_title_font(32),
+            text_color=("#1f538d", "#3b8ed0")
         )
         self.title_label.pack(pady=(0, 30))
         
@@ -120,7 +122,8 @@ class Dashboard(ctk.CTkScrollableFrame):
         value_label = ctk.CTkLabel(
             card_frame,
             text=value,
-            font=ctk.CTkFont(size=24, weight="bold")
+            font=create_heading_font(24),
+            text_color=("#1f538d", "#3b8ed0")
         )
         value_label.pack(pady=5)
         
@@ -128,7 +131,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         title_label = ctk.CTkLabel(
             card_frame,
             text=title,
-            font=ctk.CTkFont(size=14)
+            font=create_body_font(14)
         )
         title_label.pack(pady=(5, 15))
         
@@ -147,7 +150,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         sales_title = ctk.CTkLabel(
             self.sales_chart_frame,
             text="مبيعات آخر 7 أيام",
-            font=ctk.CTkFont(size=18, weight="bold")
+            font=create_heading_font(18)
         )
         sales_title.pack(pady=(10, 5))
         
@@ -158,7 +161,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         products_title = ctk.CTkLabel(
             self.products_chart_frame,
             text="أفضل المنتجات مبيعاً",
-            font=ctk.CTkFont(size=18, weight="bold")
+            font=create_heading_font(18)
         )
         products_title.pack(pady=(10, 5))
         
@@ -169,7 +172,7 @@ class Dashboard(ctk.CTkScrollableFrame):
         actions_title = ctk.CTkLabel(
             self.actions_frame,
             text="إجراءات سريعة",
-            font=ctk.CTkFont(size=18, weight="bold")
+            font=create_heading_font(18)
         )
         actions_title.pack(pady=(15, 10))
         
@@ -179,40 +182,50 @@ class Dashboard(ctk.CTkScrollableFrame):
         # Quick sale button
         self.quick_sale_btn = ctk.CTkButton(
             buttons_frame,
-            text="بيعة سريعة",
-            font=ctk.CTkFont(size=16),
-            height=40,
-            width=150
+            text="💳 بيعة سريعة",
+            font=create_button_font(16),
+            height=45,
+            width=160,
+            corner_radius=12,
+            fg_color=("#2d6a4f", "#2d6a4f"),
+            hover_color=("#40916c", "#40916c")
         )
         self.quick_sale_btn.pack(side="left", padx=10, pady=10)
         
         # Add product button
         self.add_product_btn = ctk.CTkButton(
             buttons_frame,
-            text="إضافة منتج",
-            font=ctk.CTkFont(size=16),
-            height=40,
-            width=150
+            text="➕ إضافة منتج",
+            font=create_button_font(16),
+            height=45,
+            width=160,
+            corner_radius=12,
+            fg_color=("#6f4e37", "#8b5a2b"),
+            hover_color=("#8b6914", "#a68b5b")
         )
         self.add_product_btn.pack(side="left", padx=10, pady=10)
         
         # Add customer button
         self.add_customer_btn = ctk.CTkButton(
             buttons_frame,
-            text="إضافة عميل",
-            font=ctk.CTkFont(size=16),
-            height=40,
-            width=150
+            text="👤 إضافة عميل",
+            font=create_button_font(16),
+            height=45,
+            width=160,
+            corner_radius=12,
+            fg_color=("#7209b7", "#560bad"),
+            hover_color=("#9d4edd", "#7209b7")
         )
         self.add_customer_btn.pack(side="left", padx=10, pady=10)
         
         # Refresh button
         self.refresh_btn = ctk.CTkButton(
             buttons_frame,
-            text="تحديث البيانات",
-            font=ctk.CTkFont(size=16),
-            height=40,
-            width=150,
+            text="🔄 تحديث البيانات",
+            font=create_button_font(16),
+            height=45,
+            width=160,
+            corner_radius=12,
             command=self.refresh_data
         )
         self.refresh_btn.pack(side="left", padx=10, pady=10)

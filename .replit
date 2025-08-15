@@ -6,3 +6,15 @@ channel = "stable-25_05"
 
 [deployment]
 run = ["sh", "-c", "py main.py"]
+
+[workflows]
+runButton = "Run Mobile Shop App"
+
+[[workflows.workflow]]
+name = "Run Mobile Shop App"
+author = 46463095
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
