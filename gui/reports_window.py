@@ -19,6 +19,9 @@ import os
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Import Arabic font support
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
+
 class ReportsWindow(ctk.CTkFrame):
     """Reports and analytics window"""
     
@@ -39,7 +42,7 @@ class ReportsWindow(ctk.CTkFrame):
         self.title_label = ctk.CTkLabel(
             self,
             text="التقارير والإحصائيات",
-            font=ctk.CTkFont(size=28, weight="bold")
+            font=create_title_font(28)
         )
         self.title_label.pack(pady=(0, 20))
         
@@ -86,7 +89,7 @@ class ReportsWindow(ctk.CTkFrame):
         self.date_label = ctk.CTkLabel(
             self.date_frame,
             text="نطاق التاريخ:",
-            font=ctk.CTkFont(size=14, weight="bold")
+            font=create_heading_font(14)
         )
         self.date_label.pack(anchor="w", padx=10, pady=(10, 5))
         
@@ -95,18 +98,19 @@ class ReportsWindow(ctk.CTkFrame):
         self.date_inputs_frame.pack(padx=10, pady=(0, 10))
         
         # From date
-        self.from_date_label = ctk.CTkLabel(self.date_inputs_frame, text="من:")
+        self.from_date_label = ctk.CTkLabel(self.date_inputs_frame, text="من:", font=create_body_font(12))
         self.from_date_label.pack(side="left", padx=(10, 5), pady=10)
         
         self.from_date_entry = ctk.CTkEntry(
             self.date_inputs_frame,
             placeholder_text="YYYY-MM-DD",
-            width=120
+            width=120,
+            font=create_body_font(12)
         )
         self.from_date_entry.pack(side="left", padx=5, pady=10)
         
         # To date
-        self.to_date_label = ctk.CTkLabel(self.date_inputs_frame, text="إلى:")
+        self.to_date_label = ctk.CTkLabel(self.date_inputs_frame, text="إلى:", font=create_body_font(12))
         self.to_date_label.pack(side="left", padx=(10, 5), pady=10)
         
         self.to_date_entry = ctk.CTkEntry(
@@ -433,8 +437,8 @@ class ReportsWindow(ctk.CTkFrame):
         # Get sales data
         sales_data = self.db_manager.get_sales_report(start_date, end_date)
         
-        # Calculate summary statistics
-        total_sales = sum(sale['total_amount'] for sale in sales_data)
+        # Calculate summary statistics with None value handling
+        total_sales = sum(float(sale['total_amount'] or 0) for sale in sales_data)
         total_transactions = len(sales_data)
         avg_transaction = total_sales / total_transactions if total_transactions > 0 else 0
         
@@ -502,7 +506,7 @@ class ReportsWindow(ctk.CTkFrame):
         
         if daily_sales:
             dates = [datetime.strptime(row['sale_day'], '%Y-%m-%d') for row in daily_sales]
-            amounts = [row['daily_total'] for row in daily_sales]
+            amounts = [float(row['daily_total'] or 0) for row in daily_sales]
             
             ax.plot(dates, amounts, marker='o', linewidth=2, markersize=4)
             ax.fill_between(dates, amounts, alpha=0.3)
@@ -750,8 +754,8 @@ class ReportsWindow(ctk.CTkFrame):
         financial_data = self.db_manager.execute_query(financial_query, tuple(params))
         
         if financial_data:
-            revenue = financial_data[0]['total_revenue']
-            cost = financial_data[0]['total_cost']
+            revenue = float(financial_data[0]['total_revenue'] or 0)
+            cost = float(financial_data[0]['total_cost'] or 0)
             profit = revenue - cost
             
             # Update financial cards
@@ -808,7 +812,7 @@ class ReportsWindow(ctk.CTkFrame):
         
         if profit_data:
             dates = [datetime.strptime(row['sale_day'], '%Y-%m-%d') for row in profit_data]
-            profits = [row['daily_revenue'] - row['daily_cost'] for row in profit_data]
+            profits = [float(row['daily_revenue'] or 0) - float(row['daily_cost'] or 0) for row in profit_data]
             
             # Color bars based on profit/loss
             colors = ['green' if p >= 0 else 'red' for p in profits]

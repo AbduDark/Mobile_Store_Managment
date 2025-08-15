@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -16,64 +17,67 @@ class ArabicFontManager:
 
     def __init__(self):
         self.available_fonts = []
-        self.custom_fonts = []
-        self.primary_font = None  # For titles - Hacen-Tunisia
-        self.secondary_font = None  # For general text - Ya-ModernPro-Bold
+        self.custom_fonts = {}
+        self.primary_font_path = None  # For titles - Hacen-Tunisia
+        self.secondary_font_path = None  # For general text - Ya-ModernPro-Bold
+        self.primary_font_name = None
+        self.secondary_font_name = None
         self._load_custom_fonts()
         self._detect_available_fonts()
+
+    def _get_font_path(self, font_name):
+        """Get the full path to a font file"""
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        fonts_dir = os.path.join(project_root, "fonts")
+        
+        # Check for exact file name
+        font_path = os.path.join(fonts_dir, font_name)
+        if os.path.exists(font_path):
+            return font_path
+        
+        # Check for font name with extensions
+        for ext in ['.ttf', '.otf', '.TTF', '.OTF']:
+            font_path = os.path.join(fonts_dir, f"{font_name}{ext}")
+            if os.path.exists(font_path):
+                return font_path
+        
+        return None
 
     def _load_custom_fonts(self):
         """Load custom fonts from fonts directory"""
         try:
-            # Get the fonts directory path
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            project_root = os.path.dirname(current_dir)
-            fonts_dir = os.path.join(project_root, "fonts")
-
-            if not os.path.exists(fonts_dir):
-                print(f"مجلد الخطوط غير موجود: {fonts_dir}")
-                return
-
-            font_extensions = ['.ttf', '.otf', '.TTF', '.OTF']
-
-            # Get all font files
-            font_files = []
-            for file in os.listdir(fonts_dir):
-                if any(file.endswith(ext) for ext in font_extensions):
-                    font_path = os.path.join(fonts_dir, file)
-                    font_files.append((file, font_path))
-
-            if not font_files:
-                print("لم يتم العثور على ملفات خطوط في المجلد")
-                return
-
-            # Load fonts for tkinter
-            for font_file, font_path in font_files:
-                try:
-                    # Try to load the font
-                    if platform.system() == "Windows":
+            # Get specific font paths
+            self.primary_font_path = self._get_font_path('Hacen-Tunisia.ttf')
+            self.secondary_font_path = self._get_font_path('Ya-ModernPro-Bold.otf')
+            
+            if self.primary_font_path:
+                # Register font for Windows if needed
+                if platform.system() == "Windows":
+                    try:
                         import ctypes
-                        ctypes.windll.gdi32.AddFontResourceW(font_path)
-
-                    font_name = os.path.splitext(font_file)[0]
-
-                    # Set primary and secondary fonts
-                    if "Hacen-Tunisia" in font_file:
-                        self.primary_font = font_name
-                        print(f"تم تحديد الخط الأساسي: {font_name}")
-                    elif "Ya-ModernPro" in font_file:
-                        self.secondary_font = font_name
-                        print(f"تم تحديد الخط الفرعي: {font_name}")
-
-                    self.custom_fonts.append({
-                        'name': font_name,
-                        'path': font_path,
-                        'file': font_file
-                    })
-                    print(f"تم تحميل الخط: {font_name}")
-
-                except Exception as e:
-                    print(f"خطأ في تحميل الخط {font_file}: {e}")
+                        ctypes.windll.gdi32.AddFontResourceW(self.primary_font_path)
+                    except:
+                        pass
+                
+                # Extract font name for reference
+                self.primary_font_name = "Hacen-Tunisia"
+                print(f"تم تحديد الخط الأساسي: {self.primary_font_name}")
+                print(f"مسار الخط: {self.primary_font_path}")
+            
+            if self.secondary_font_path:
+                # Register font for Windows if needed
+                if platform.system() == "Windows":
+                    try:
+                        import ctypes
+                        ctypes.windll.gdi32.AddFontResourceW(self.secondary_font_path)
+                    except:
+                        pass
+                
+                # Extract font name for reference
+                self.secondary_font_name = "Ya-ModernPro-Bold"
+                print(f"تم تحديد الخط الفرعي: {self.secondary_font_name}")
+                print(f"مسار الخط: {self.secondary_font_path}")
 
         except Exception as e:
             print(f"خطأ في تحميل الخطوط المخصصة: {e}")
@@ -88,51 +92,59 @@ class ArabicFontManager:
             system_fonts = list(tkFont.families())
             root.destroy()
 
-            # Combine custom and system fonts
-            self.available_fonts = [f['name'] for f in self.custom_fonts] + system_fonts
-
             # Set fallback fonts if custom fonts not found
-            if not self.primary_font:
+            if not self.primary_font_path:
                 arabic_fonts = ['Tahoma', 'Arial Unicode MS', 'Segoe UI', 'Calibri']
                 for font in arabic_fonts:
                     if font in system_fonts:
-                        self.primary_font = font
+                        self.primary_font_name = font
                         break
                 else:
-                    self.primary_font = 'TkDefaultFont'
+                    self.primary_font_name = 'TkDefaultFont'
 
-            if not self.secondary_font:
+            if not self.secondary_font_path:
                 arabic_fonts = ['Tahoma', 'Arial Unicode MS', 'Segoe UI', 'Times New Roman']
                 for font in arabic_fonts:
                     if font in system_fonts:
-                        self.secondary_font = font
+                        self.secondary_font_name = font
                         break
                 else:
-                    self.secondary_font = 'TkDefaultFont'
+                    self.secondary_font_name = 'TkDefaultFont'
 
-            print(f"الخطوط المتاحة: {self.available_fonts[:8]}")  # Show first 8
-            print(f"الخط الأساسي: {self.primary_font}")
-            print(f"الخط الفرعي: {self.secondary_font}")
+            print(f"الخط الأساسي: {self.primary_font_name}")
+            print(f"الخط الفرعي: {self.secondary_font_name}")
 
         except Exception as e:
             print(f"خطأ في اكتشاف الخطوط: {e}")
-            self.available_fonts = ['TkDefaultFont']
-            if not self.primary_font:
-                self.primary_font = 'TkDefaultFont'
-            if not self.secondary_font:
-                self.secondary_font = 'TkDefaultFont'
+            if not self.primary_font_name:
+                self.primary_font_name = 'TkDefaultFont'
+            if not self.secondary_font_name:
+                self.secondary_font_name = 'TkDefaultFont'
 
     def get_primary_font(self, size: int = 16, weight: str = "bold") -> ctk.CTkFont:
         """Get primary font for titles (Hacen-Tunisia)"""
-        return ctk.CTkFont(family=self.primary_font, size=size, weight=weight)
+        if self.primary_font_path:
+            # Use font file directly
+            return ctk.CTkFont(family=self.primary_font_path, size=size, weight=weight)
+        else:
+            # Fallback to font name
+            return ctk.CTkFont(family=self.primary_font_name, size=size, weight=weight)
 
     def get_secondary_font(self, size: int = 12, weight: str = "normal") -> ctk.CTkFont:
         """Get secondary font for general text (Ya-ModernPro)"""
-        return ctk.CTkFont(family=self.secondary_font, size=size, weight=weight)
+        if self.secondary_font_path:
+            # Use font file directly
+            return ctk.CTkFont(family=self.secondary_font_path, size=size, weight=weight)
+        else:
+            # Fallback to font name
+            return ctk.CTkFont(family=self.secondary_font_name, size=size, weight=weight)
 
     def get_font_family(self, is_title: bool = False) -> str:
         """Get font family name"""
-        return self.primary_font if is_title else self.secondary_font
+        if is_title:
+            return self.primary_font_path if self.primary_font_path else self.primary_font_name
+        else:
+            return self.secondary_font_path if self.secondary_font_path else self.secondary_font_name
 
 # Global font manager instance
 _font_manager = None

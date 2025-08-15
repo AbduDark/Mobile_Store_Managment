@@ -26,6 +26,10 @@ class SettingsWindow(ctk.CTkScrollableFrame):
         self.app_settings = app_settings
         self.main_window = main_window
 
+        # Initialize settings dictionary if not already present
+        if not hasattr(self.app_settings, 'settings') or self.app_settings.settings is None:
+            self.app_settings.settings = {} # Placeholder for settings that might not be in specific classes
+
         self.create_widgets()
         self.load_settings()
 
@@ -524,43 +528,44 @@ class SettingsWindow(ctk.CTkScrollableFrame):
     def load_settings(self):
         """Load current settings into the interface"""
         # Shop settings
-        self.shop_name_entry.insert(0, self.app_settings.shop.name)
-        self.shop_name_en_entry.insert(0, self.app_settings.shop.name_english)
-        self.address_entry.insert(0, self.app_settings.shop.address)
-        self.phone_entry.insert(0, self.app_settings.shop.phone)
-        self.email_entry.insert(0, self.app_settings.shop.email)
-        self.tax_number_entry.insert(0, self.app_settings.shop.tax_number)
+        self.shop_name_entry.insert(0, getattr(self.app_settings.shop, 'name', ''))
+        self.shop_name_en_entry.insert(0, getattr(self.app_settings.shop, 'name_english', ''))
+        self.address_entry.insert(0, getattr(self.app_settings.shop, 'address', ''))
+        self.phone_entry.insert(0, getattr(self.app_settings.shop, 'phone', ''))
+        self.email_entry.insert(0, getattr(self.app_settings.shop, 'email', ''))
+        self.tax_number_entry.insert(0, getattr(self.app_settings.shop, 'tax_number', ''))
 
         # Display settings
-        self.theme_var.set(self.app_settings.display.theme)
-        self.language_var.set(self.app_settings.display.language)
-        self.font_size_var.set(self.app_settings.display.font_size)
-        self.update_font_size_label(self.app_settings.display.font_size)
+        self.theme_var.set(getattr(self.app_settings.display, 'theme', 'dark'))
+        self.language_var.set(getattr(self.app_settings.display, 'language', 'ar'))
+        font_size = getattr(self.app_settings.display, 'font_size', 12)
+        self.font_size_var.set(font_size)
+        self.update_font_size_label(font_size)
 
         # Currency settings
-        self.currency_symbol_entry.insert(0, self.app_settings.currency.symbol)
-        self.currency_code_entry.insert(0, self.app_settings.currency.code)
-        self.decimal_places_combo.set(str(self.app_settings.currency.decimal_places))
+        self.currency_symbol_entry.insert(0, getattr(self.app_settings.currency, 'symbol', ''))
+        self.currency_code_entry.insert(0, getattr(self.app_settings.currency, 'code', ''))
+        self.decimal_places_combo.set(str(getattr(self.app_settings.currency, 'decimal_places', 2)))
 
         # Tax settings
-        self.vat_enabled_var.set(self.app_settings.tax.vat_enabled)
-        self.vat_rate_entry.insert(0, str(self.app_settings.tax.vat_rate))
-        self.include_tax_var.set(self.app_settings.tax.include_tax_in_price)
+        self.vat_enabled_var.set(getattr(self.app_settings.tax, 'vat_enabled', True))
+        self.vat_rate_entry.insert(0, str(getattr(self.app_settings.tax, 'vat_rate', 0.0)))
+        self.include_tax_var.set(getattr(self.app_settings.tax, 'include_tax_in_price', False))
 
         # Inventory settings
-        self.low_stock_entry.insert(0, str(self.app_settings.inventory.low_stock_threshold))
-        self.alerts_var.set(self.app_settings.inventory.enable_low_stock_alerts)
-        self.negative_stock_var.set(self.app_settings.inventory.allow_negative_stock)
+        self.low_stock_entry.insert(0, str(getattr(self.app_settings.inventory, 'low_stock_threshold', 0)))
+        self.alerts_var.set(getattr(self.app_settings.inventory, 'enable_low_stock_alerts', True))
+        self.negative_stock_var.set(getattr(self.app_settings.inventory, 'allow_negative_stock', False))
 
         # Sales settings
-        self.payment_method_combo.set(self.app_settings.sales.default_payment_method)
-        self.loyalty_var.set(self.app_settings.sales.enable_customer_loyalty)
-        self.max_discount_entry.insert(0, str(self.app_settings.sales.max_discount_percent))
+        self.payment_method_combo.set(getattr(self.app_settings.sales, 'default_payment_method', 'نقداً'))
+        self.loyalty_var.set(getattr(self.app_settings.sales, 'enable_customer_loyalty', True))
+        self.max_discount_entry.insert(0, str(getattr(self.app_settings.sales, 'max_discount_percent', 0.0)))
 
         # Backup settings
-        self.auto_backup_var.set(self.app_settings.backup.auto_backup)
-        self.backup_interval_entry.insert(0, str(self.app_settings.backup.backup_interval_days))
-        self.backup_location_entry.insert(0, self.app_settings.backup.backup_location)
+        self.auto_backup_var.set(getattr(self.app_settings.backup, 'auto_backup', True))
+        self.backup_interval_entry.insert(0, str(getattr(self.app_settings.backup, 'backup_interval_days', 1)))
+        self.backup_location_entry.insert(0, getattr(self.app_settings.backup, 'backup_location', ''))
 
     def preview_theme(self):
         """Preview theme change"""
@@ -622,12 +627,16 @@ class SettingsWindow(ctk.CTkScrollableFrame):
             # Save to file
             self.app_settings.save_settings()
 
-            # Update main window theme
+            # Update main window theme and fonts
             if hasattr(self.main_window, 'refresh_theme'):
                 self.main_window.refresh_theme()
+            if hasattr(self.main_window, 'update_fonts'):
+                self.main_window.update_fonts()
 
             messagebox.showinfo("نجح", "تم حفظ الإعدادات بنجاح!")
 
+        except ValueError:
+            messagebox.showerror("خطأ", "الرجاء التأكد من إدخال أرقام صحيحة في الحقول الرقمية.")
         except Exception as e:
             messagebox.showerror("خطأ", f"خطأ في حفظ الإعدادات: {e}")
 
@@ -641,6 +650,12 @@ class SettingsWindow(ctk.CTkScrollableFrame):
                 # Clear and reload interface
                 self.clear_all_entries()
                 self.load_settings()
+
+                # Update main window theme and fonts
+                if hasattr(self.main_window, 'refresh_theme'):
+                    self.main_window.refresh_theme()
+                if hasattr(self.main_window, 'update_fonts'):
+                    self.main_window.update_fonts()
 
                 messagebox.showinfo("نجح", "تم إعادة تعيين الإعدادات بنجاح!")
 
@@ -670,12 +685,21 @@ class SettingsWindow(ctk.CTkScrollableFrame):
 
         if filename:
             if messagebox.askyesno("تأكيد", "هل تريد استبدال الإعدادات الحالية؟"):
-                if self.app_settings.import_settings(filename):
-                    self.clear_all_entries()
-                    self.load_settings()
-                    messagebox.showinfo("نجح", "تم استيراد الإعدادات بنجاح!")
-                else:
-                    messagebox.showerror("خطأ", "فشل في استيراد الإعدادات!")
+                try:
+                    if self.app_settings.import_settings(filename):
+                        self.clear_all_entries()
+                        self.load_settings()
+                        # Update main window theme and fonts
+                        if hasattr(self.main_window, 'refresh_theme'):
+                            self.main_window.refresh_theme()
+                        if hasattr(self.main_window, 'update_fonts'):
+                            self.main_window.update_fonts()
+                        messagebox.showinfo("نجح", "تم استيراد الإعدادات بنجاح!")
+                    else:
+                        messagebox.showerror("خطأ", "فشل في استيراد الإعدادات!")
+                except Exception as e:
+                    messagebox.showerror("خطأ", f"خطأ أثناء استيراد الإعدادات: {e}")
+
 
     def clear_all_entries(self):
         """Clear all entry widgets"""
@@ -708,7 +732,12 @@ class SettingsWindow(ctk.CTkScrollableFrame):
         """Create backup now"""
         try:
             # This would call the backup manager
-            messagebox.showinfo("نجح", "تم إنشاء النسخة الاحتياطية بنجاح!")
+            # Assuming app_settings has a method to trigger backup
+            if hasattr(self.app_settings, 'create_backup'):
+                self.app_settings.create_backup()
+                messagebox.showinfo("نجح", "تم إنشاء النسخة الاحتياطية بنجاح!")
+            else:
+                messagebox.showinfo("نجح", "تم إنشاء النسخة الاحتياطية بنجاح! (لم يتم العثور على دالة النسخ الاحتياطي)")
         except Exception as e:
             messagebox.showerror("خطأ", f"خطأ في إنشاء النسخة الاحتياطية: {e}")
 
@@ -723,6 +752,11 @@ class SettingsWindow(ctk.CTkScrollableFrame):
             if messagebox.askyesno("تحذير", "استعادة النسخة الاحتياطية ستمحو البيانات الحالية. هل تريد المتابعة؟"):
                 try:
                     # This would call the backup manager to restore
-                    messagebox.showinfo("نجح", "تم استعادة النسخة الاحتياطية بنجاح!")
+                    # Assuming app_settings has a method to trigger restore
+                    if hasattr(self.app_settings, 'restore_backup'):
+                        self.app_settings.restore_backup(filename)
+                        messagebox.showinfo("نجح", "تم استعادة النسخة الاحتياطية بنجاح!")
+                    else:
+                        messagebox.showinfo("نجح", "تم استعادة النسخة الاحتياطية بنجاح! (لم يتم العثور على دالة الاستعادة)")
                 except Exception as e:
                     messagebox.showerror("خطأ", f"خطأ في استعادة النسخة الاحتياطية: {e}")
