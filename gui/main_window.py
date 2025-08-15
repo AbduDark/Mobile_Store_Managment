@@ -24,6 +24,7 @@ from utils.arabic_support import (
     setup_arabic_font, create_title_font, create_heading_font,
     create_button_font, create_body_font, get_font_manager
 )
+from utils.icon_manager import get_icon_manager
 from config.settings import get_app_settings
 
 class MobileShopApp(ctk.CTk):
@@ -35,6 +36,7 @@ class MobileShopApp(ctk.CTk):
         # Initialize database and settings
         self.db_manager = DatabaseManager()
         self.app_settings = get_app_settings()
+        self.icon_manager = get_icon_manager()
 
         # Configure window
         self.title("نظام إدارة محل الموبايلات - Mobile Shop Management")
@@ -83,10 +85,11 @@ class MobileShopApp(ctk.CTk):
         )
         self.subtitle_label.grid(row=1, column=0, padx=20, pady=(0, 25))
 
-        # Navigation buttons with enhanced styling
-        self.dashboard_button = ctk.CTkButton(
+        # Navigation buttons with enhanced styling and icons
+        self.dashboard_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="🏠 الرئيسية",
+            icon_name="dashboard",
+            text="الرئيسية",
             command=self.show_dashboard,
             font=create_button_font(16),
             height=50,
@@ -97,9 +100,10 @@ class MobileShopApp(ctk.CTk):
         )
         self.dashboard_button.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
 
-        self.products_button = ctk.CTkButton(
+        self.products_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="📱 المنتجات",
+            icon_name="products",
+            text="المنتجات",
             command=self.show_products,
             font=create_button_font(16),
             height=50,
@@ -110,9 +114,10 @@ class MobileShopApp(ctk.CTk):
         )
         self.products_button.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
 
-        self.sales_button = ctk.CTkButton(
+        self.sales_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="💰 المبيعات",
+            icon_name="sales",
+            text="المبيعات",
             command=self.show_sales,
             font=create_button_font(16),
             height=50,
@@ -123,9 +128,10 @@ class MobileShopApp(ctk.CTk):
         )
         self.sales_button.grid(row=4, column=0, padx=20, pady=10, sticky="ew")
 
-        self.customers_button = ctk.CTkButton(
+        self.customers_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="👥 العملاء",
+            icon_name="customers",
+            text="العملاء",
             command=self.show_customers,
             font=create_button_font(16),
             height=50,
@@ -136,9 +142,10 @@ class MobileShopApp(ctk.CTk):
         )
         self.customers_button.grid(row=5, column=0, padx=20, pady=10, sticky="ew")
 
-        self.reports_button = ctk.CTkButton(
+        self.reports_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="📊 التقارير",
+            icon_name="reports",
+            text="التقارير",
             command=self.show_reports,
             font=create_button_font(16),
             height=50,
@@ -150,9 +157,10 @@ class MobileShopApp(ctk.CTk):
         self.reports_button.grid(row=6, column=0, padx=20, pady=10, sticky="ew")
 
         # Settings button
-        self.settings_button = ctk.CTkButton(
+        self.settings_button = self.icon_manager.create_icon_button(
             self.sidebar_frame,
-            text="⚙️ الإعدادات",
+            icon_name="settings",
+            text="الإعدادات",
             command=self.show_settings,
             font=create_button_font(16),
             height=50,

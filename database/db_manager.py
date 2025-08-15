@@ -12,24 +12,26 @@ from typing import List, Dict, Any, Optional
 
 class DatabaseManager:
     """Database manager class for handling all database operations"""
-    
+
     def __init__(self, db_name: str = "mobile_shop.db"):
         """Initialize database manager"""
         self.db_name = db_name
-        self.db_path = os.path.join(os.path.dirname(__file__), "..", self.db_name)
+        # Construct the database path relative to the current file's directory
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.db_path = os.path.join(script_dir, "..", self.db_name)
         self.create_tables()
-    
+
     def get_connection(self):
         """Get database connection"""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row  # Enable column access by name
         return conn
-    
+
     def create_tables(self):
         """Create all necessary database tables"""
         conn = self.get_connection()
         cursor = conn.cursor()
-        
+
         try:
             # Products table - جدول المنتجات
             cursor.execute('''
@@ -53,7 +55,7 @@ class DatabaseManager:
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
+
             # Customers table - جدول العملاء
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS customers (
@@ -69,7 +71,7 @@ class DatabaseManager:
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
+
             # Sales table - جدول المبيعات
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS sales (
@@ -85,7 +87,7 @@ class DatabaseManager:
                     FOREIGN KEY (customer_id) REFERENCES customers (id)
                 )
             ''')
-            
+
             # Sale items table - جدول عناصر المبيعات
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS sale_items (
@@ -99,7 +101,7 @@ class DatabaseManager:
                     FOREIGN KEY (product_id) REFERENCES products (id)
                 )
             ''')
-            
+
             # Services/Repairs table - جدول الصيانة
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS services (
@@ -118,7 +120,7 @@ class DatabaseManager:
                     FOREIGN KEY (customer_id) REFERENCES customers (id)
                 )
             ''')
-            
+
             # Expenses table - جدول المصروفات
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS expenses (
@@ -130,7 +132,7 @@ class DatabaseManager:
                     notes TEXT
                 )
             ''')
-            
+
             # Suppliers table - جدول الموردين
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS suppliers (
@@ -143,7 +145,7 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
+
             # Stock movements table - جدول حركة المخزون
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS stock_movements (
@@ -158,73 +160,75 @@ class DatabaseManager:
                     FOREIGN KEY (product_id) REFERENCES products (id)
                 )
             ''')
-            
+
             # Create indexes for better performance
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(barcode)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sales_date ON sales(sale_date)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_stock_movements_product ON stock_movements(product_id)')
-            
+
             conn.commit()
             print("تم إنشاء جداول قاعدة البيانات بنجاح")
-            
+
             # Add sample data if tables are empty
             self.add_sample_data_if_needed(conn)
-            
+
         except sqlite3.Error as e:
             print(f"خطأ في إنشاء جداول قاعدة البيانات: {e}")
             conn.rollback()
         finally:
             conn.close()
-    
+
     def add_sample_data_if_needed(self, conn):
         """Add sample data if database is empty"""
         try:
             cursor = conn.cursor()
-            
-            # Check if we have any products
+
+            # Check if we have any products to determine if sample data needs to be added
             cursor.execute("SELECT COUNT(*) FROM products")
             product_count = cursor.fetchone()[0]
-            
+
             if product_count == 0:
                 print("إضافة بيانات تجريبية...")
-                
+
                 # Add sample products
                 sample_products = [
-                    ("iPhone 15 Pro", "Apple", "iPhone 15 Pro", "هواتف ذكية جديدة", 4500, 5200, 10, 2, "", "أحدث هاتف من آبل", "أسود", "256GB", "جديد", ""),
-                    ("Galaxy S24", "Samsung", "Galaxy S24", "هواتف ذكية جديدة", 3200, 3800, 8, 2, "", "هاتف سامسونج الرائد", "أزرق", "128GB", "جديد", ""),
-                    ("iPhone 13", "Apple", "iPhone 13", "هواتف مستعملة", 2800, 3200, 5, 1, "", "آيفون 13 حالة ممتازة", "أبيض", "128GB", "مستعمل ممتاز", ""),
-                    ("شاحن لاسلكي", "Anker", "PowerWave", "إكسسوارات", 120, 180, 15, 3, "", "شاحن لاسلكي سريع", "أسود", "", "جديد", ""),
-                    ("جراب حماية", "OtterBox", "Defender", "إكسسوارات", 80, 150, 20, 5, "", "جراب حماية قوي", "شفاف", "", "جديد", "")
+                    ("iPhone 15 Pro", "Apple", "iPhone 15 Pro", "هواتف ذكية جديدة", 4500, 5200, 10, 2, "8806098576987", "أحدث هاتف من آبل", "أسود", "256GB", "جديد", ""),
+                    ("Galaxy S24", "Samsung", "Galaxy S24", "هواتف ذكية جديدة", 3200, 3800, 8, 2, "8806098576988", "هاتف سامسونج الرائد", "أزرق", "128GB", "جديد", ""),
+                    ("iPhone 13", "Apple", "iPhone 13", "هواتف مستعملة", 2800, 3200, 5, 1, "8806098576989", "آيفون 13 حالة ممتازة", "أبيض", "128GB", "مستعمل ممتاز", ""),
+                    ("شاحن لاسلكي", "Anker", "PowerWave", "إكسسوارات", 120, 180, 15, 3, "8806098576990", "شاحن لاسلكي سريع", "أسود", "", "جديد", ""),
+                    ("جراب حماية", "OtterBox", "Defender", "إكسسوارات", 80, 150, 20, 5, "8806098576991", "جراب حماية قوي", "شفاف", "", "جديد", "")
                 ]
-                
+
                 for product in sample_products:
+                    # Use INSERT OR IGNORE to handle potential barcode uniqueness constraint violations
                     cursor.execute('''
-                        INSERT INTO products (name, brand, model, category, purchase_price, 
+                        INSERT OR IGNORE INTO products (name, brand, model, category, purchase_price, 
                                             selling_price, quantity, min_quantity, barcode, 
                                             description, color, storage, condition, image_path)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', product)
-                
+
                 # Add sample customers
                 sample_customers = [
                     ("أحمد محمد", "0501234567", "ahmed@email.com", "الرياض", ""),
                     ("فاطمة علي", "0507654321", "fatima@email.com", "جدة", ""),
                     ("محمد السعد", "0551234567", "", "الدمام", "عميل مميز")
                 ]
-                
+
                 for customer in sample_customers:
+                    # Use INSERT OR IGNORE to handle potential phone uniqueness constraint violations
                     cursor.execute('''
-                        INSERT INTO customers (name, phone, email, address, notes)
+                        INSERT OR IGNORE INTO customers (name, phone, email, address, notes)
                         VALUES (?, ?, ?, ?, ?)
                     ''', customer)
-                
+
                 conn.commit()
                 print("تم إضافة البيانات التجريبية بنجاح")
-                
+
         except sqlite3.Error as e:
             print(f"خطأ في إضافة البيانات التجريبية: {e}")
-    
+
     def execute_query(self, query: str, params: tuple = ()) -> List[Dict]:
         """Execute a SELECT query and return results"""
         conn = self.get_connection()
@@ -236,7 +240,7 @@ class DatabaseManager:
             return [dict(zip(columns, row)) for row in rows]
         finally:
             conn.close()
-    
+
     def execute_non_query(self, query: str, params: tuple = ()) -> int:
         """Execute INSERT, UPDATE, DELETE queries and return affected rows"""
         conn = self.get_connection()
@@ -250,7 +254,7 @@ class DatabaseManager:
             raise e
         finally:
             conn.close()
-    
+
     def get_last_insert_id(self, query: str, params: tuple = ()) -> int:
         """Execute INSERT query and return the last inserted ID"""
         conn = self.get_connection()
@@ -264,7 +268,7 @@ class DatabaseManager:
             raise e
         finally:
             conn.close()
-    
+
     # Product management methods
     def add_product(self, product_data: Dict[str, Any]) -> int:
         """Add a new product to the database"""
@@ -290,19 +294,20 @@ class DatabaseManager:
             product_data.get('condition', 'new'),
             product_data.get('image_path', '')
         )
+        # Using get_last_insert_id which internally handles commit and rollback
         return self.get_last_insert_id(query, params)
-    
+
     def get_all_products(self) -> List[Dict]:
         """Get all products from the database"""
         query = "SELECT * FROM products ORDER BY name"
         return self.execute_query(query)
-    
+
     def get_product_by_id(self, product_id: int) -> Optional[Dict]:
         """Get a product by its ID"""
         query = "SELECT * FROM products WHERE id = ?"
         results = self.execute_query(query, (product_id,))
         return results[0] if results else None
-    
+
     def update_product(self, product_id: int, product_data: Dict[str, Any]) -> int:
         """Update a product in the database"""
         query = '''
@@ -331,17 +336,17 @@ class DatabaseManager:
             product_id
         )
         return self.execute_non_query(query, params)
-    
+
     def delete_product(self, product_id: int) -> int:
         """Delete a product from the database"""
         query = "DELETE FROM products WHERE id = ?"
         return self.execute_non_query(query, (product_id,))
-    
+
     def get_low_stock_products(self) -> List[Dict]:
         """Get products with low stock"""
         query = "SELECT * FROM products WHERE quantity <= min_quantity ORDER BY quantity"
         return self.execute_query(query)
-    
+
     # Customer management methods
     def add_customer(self, customer_data: Dict[str, Any]) -> int:
         """Add a new customer to the database"""
@@ -357,25 +362,25 @@ class DatabaseManager:
             customer_data.get('notes', '')
         )
         return self.get_last_insert_id(query, params)
-    
+
     def get_all_customers(self) -> List[Dict]:
         """Get all customers from the database"""
         query = "SELECT * FROM customers ORDER BY name"
         return self.execute_query(query)
-    
+
     def get_customer_by_phone(self, phone: str) -> Optional[Dict]:
         """Get a customer by phone number"""
         query = "SELECT * FROM customers WHERE phone = ?"
         results = self.execute_query(query, (phone,))
         return results[0] if results else None
-    
+
     # Sales management methods
     def create_sale(self, sale_data: Dict[str, Any], items: List[Dict[str, Any]]) -> int:
         """Create a new sale with items"""
         conn = self.get_connection()
         try:
             cursor = conn.cursor()
-            
+
             # Insert sale record
             sale_query = '''
                 INSERT INTO sales (customer_id, total_amount, discount, tax, 
@@ -393,7 +398,7 @@ class DatabaseManager:
             )
             cursor.execute(sale_query, sale_params)
             sale_id = cursor.lastrowid
-            
+
             # Insert sale items and update product quantities
             for item in items:
                 # Insert sale item
@@ -409,13 +414,13 @@ class DatabaseManager:
                     item['total_price']
                 )
                 cursor.execute(item_query, item_params)
-                
+
                 # Update product quantity
                 update_qty_query = '''
                     UPDATE products SET quantity = quantity - ? WHERE id = ?
                 '''
                 cursor.execute(update_qty_query, (item['quantity'], item['product_id']))
-                
+
                 # Add stock movement record
                 stock_query = '''
                     INSERT INTO stock_movements (product_id, movement_type, quantity, 
@@ -423,7 +428,7 @@ class DatabaseManager:
                     VALUES (?, 'out', ?, ?, 'sale', 'بيع')
                 '''
                 cursor.execute(stock_query, (item['product_id'], item['quantity'], sale_id))
-            
+
             # Update customer total purchases if customer exists
             if sale_data.get('customer_id'):
                 update_customer_query = '''
@@ -437,16 +442,16 @@ class DatabaseManager:
                     loyalty_points,
                     sale_data.get('customer_id')
                 ))
-            
+
             conn.commit()
             return sale_id
-            
+
         except sqlite3.Error as e:
             conn.rollback()
             raise e
         finally:
             conn.close()
-    
+
     def get_sales_report(self, start_date: str = None, end_date: str = None) -> List[Dict]:
         """Get sales report for a date range"""
         query = '''
@@ -455,7 +460,7 @@ class DatabaseManager:
             LEFT JOIN customers c ON s.customer_id = c.id
         '''
         params = []
-        
+
         if start_date and end_date:
             query += " WHERE DATE(s.sale_date) BETWEEN ? AND ?"
             params = [start_date, end_date]
@@ -465,14 +470,14 @@ class DatabaseManager:
         elif end_date:
             query += " WHERE DATE(s.sale_date) <= ?"
             params = [end_date]
-        
+
         query += " ORDER BY s.sale_date DESC"
         return self.execute_query(query, tuple(params))
-    
+
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get dashboard statistics"""
         stats = {}
-        
+
         # Today's sales
         today = datetime.now().strftime('%Y-%m-%d')
         today_sales = self.execute_query(
@@ -481,7 +486,7 @@ class DatabaseManager:
         )
         stats['today_sales_count'] = today_sales[0]['count']
         stats['today_sales_total'] = today_sales[0]['total']
-        
+
         # This month's sales
         month_start = datetime.now().replace(day=1).strftime('%Y-%m-%d')
         month_sales = self.execute_query(
@@ -490,22 +495,22 @@ class DatabaseManager:
         )
         stats['month_sales_count'] = month_sales[0]['count']
         stats['month_sales_total'] = month_sales[0]['total']
-        
+
         # Total products
         product_stats = self.execute_query(
             "SELECT COUNT(*) as total_products, COALESCE(SUM(quantity), 0) as total_quantity FROM products"
         )
         stats['total_products'] = product_stats[0]['total_products']
         stats['total_quantity'] = product_stats[0]['total_quantity']
-        
+
         # Low stock count
         low_stock = self.execute_query(
             "SELECT COUNT(*) as count FROM products WHERE quantity <= min_quantity"
         )
         stats['low_stock_count'] = low_stock[0]['count']
-        
+
         # Total customers
         customer_stats = self.execute_query("SELECT COUNT(*) as count FROM customers")
         stats['total_customers'] = customer_stats[0]['count']
-        
+
         return stats

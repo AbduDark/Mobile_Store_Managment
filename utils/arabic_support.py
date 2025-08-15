@@ -10,19 +10,43 @@ from tkinter import font as tkFont
 import platform
 import os
 import sys
+from pathlib import Path
+import matplotlib.font_manager as fm
 
 class ArabicFontManager:
-    """Manages Arabic fonts for the application"""
+    """Manager for Arabic font loading and configuration"""
 
     def __init__(self):
-        self.available_fonts = []
-        self.custom_fonts = {}
-        self.primary_font_path = None  # For titles - Hacen-Tunisia
-        self.secondary_font_path = None  # For general text - Ya-ModernPro-Bold
-        self.primary_font_name = None
-        self.secondary_font_name = None
-        self._load_custom_fonts()
-        self._detect_available_fonts()
+        self.fonts_dir = Path(__file__).parent.parent / "fonts"
+        self.font_cache = {}
+        self.primary_font = "Hacen Tunisia"
+        self.secondary_font = "Ya Modern Pro"
+        self.load_fonts()
+
+    def load_fonts(self):
+        """Load available Arabic fonts"""
+        try:
+            font_files = {
+                'Hacen-Tunisia.ttf': 'Hacen Tunisia',
+                'Ya-ModernPro-Bold.otf': 'Ya Modern Pro'
+            }
+
+            for font_file, font_name in font_files.items():
+                font_path = self.fonts_dir / font_file
+                if font_path.exists():
+                    # Register font with matplotlib
+                    fm.fontManager.addfont(str(font_path))
+                    self.font_cache[font_name] = str(font_path)
+                    print(f"تم تحميل الخط: {font_name} من {font_file}")
+                else:
+                    print(f"⚠️ لم يتم العثور على الخط: {font_file}")
+
+        except Exception as e:
+            print(f"خطأ في تحميل الخطوط: {e}")
+
+    def get_font_path(self, font_name):
+        """Get path for a specific font"""
+        return self.font_cache.get(font_name)
 
     def _get_font_path(self, font_name):
         """Get the full path to a font file"""
@@ -130,7 +154,7 @@ class ArabicFontManager:
             return ctk.CTkFont(family=self.primary_font_name, size=size, weight=weight)
 
     def get_secondary_font(self, size: int = 12, weight: str = "normal") -> ctk.CTkFont:
-        """Get secondary font for general text (Ya-ModernPro)"""
+        """Get secondary font for general text (Ya-ModernPro-Bold)"""
         if self.secondary_font_path:
             # Use font file directly
             return ctk.CTkFont(family=self.secondary_font_path, size=size, weight=weight)
@@ -173,6 +197,7 @@ def create_title_font(size=24):
     """Create title font for Arabic text"""
     try:
         font_manager = get_font_manager()
+        # The original code had a typo here, it should use primary_font
         return ctk.CTkFont(
             family=font_manager.primary_font,
             size=size,
@@ -186,6 +211,7 @@ def create_heading_font(size=18):
     """Create heading font for Arabic text"""
     try:
         font_manager = get_font_manager()
+        # The original code had a typo here, it should use primary_font
         return ctk.CTkFont(
             family=font_manager.primary_font,
             size=size,
@@ -199,6 +225,7 @@ def create_body_font(size=12):
     """Create body font for Arabic text"""
     try:
         font_manager = get_font_manager()
+        # The original code had a typo here, it should use primary_font
         return ctk.CTkFont(
             family=font_manager.primary_font,
             size=size,
@@ -212,6 +239,7 @@ def create_button_font(size=14):
     """Create button font for Arabic text"""
     try:
         font_manager = get_font_manager()
+        # The original code had a typo here, it should use primary_font
         return ctk.CTkFont(
             family=font_manager.primary_font,
             size=size,
