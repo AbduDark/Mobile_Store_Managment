@@ -1,0 +1,54 @@
+2025-08-15 22:48:26,003 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
+2025-08-15 22:48:26,007 - __main__ - INFO - Application setup completed successfully
+2025-08-15 22:48:27,809 - src.core.settings - INFO - Settings loaded successfully
+2025-08-15 22:48:27,810 - src.app - INFO - Settings manager initialized
+2025-08-15 22:48:27,815 - src.core.database - INFO - Database tables created successfully
+2025-08-15 22:48:27,816 - src.core.database - INFO - Database initialized successfully
+2025-08-15 22:48:27,817 - src.app - INFO - Database manager initialized
+2025-08-15 22:48:27,821 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:48:27,822 - src.core.settings - INFO - Updated setting theme to dark
+2025-08-15 22:48:27,824 - src.core.theme - INFO - Applied theme: dark
+2025-08-15 22:48:27,825 - src.app - INFO - Theme manager initialized
+2025-08-15 22:48:34,805 - src.ui.main_window - INFO - Switched to view: dashboard
+2025-08-15 22:48:34,806 - src.ui.main_window - INFO - Main window initialized
+2025-08-15 22:48:34,807 - src.app - INFO - Application started successfully
+2025-08-15 22:48:41,423 - src.ui.main_window - INFO - Switched to view: products
+2025-08-15 22:48:41,424 - src.ui.components.sidebar - INFO - Navigated to: products
+2025-08-15 22:48:42,818 - src.ui.main_window - INFO - Switched to view: sales
+2025-08-15 22:48:42,818 - src.ui.components.sidebar - INFO - Navigated to: sales
+2025-08-15 22:48:43,921 - src.ui.main_window - INFO - Switched to view: sales
+2025-08-15 22:48:43,921 - src.ui.components.sidebar - INFO - Navigated to: sales
+2025-08-15 22:48:44,758 - src.ui.main_window - INFO - Switched to view: customers
+2025-08-15 22:48:44,759 - src.ui.components.sidebar - INFO - Navigated to: customers
+2025-08-15 22:48:51,011 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:48:51,012 - src.core.settings - INFO - Updated setting theme to light
+2025-08-15 22:48:51,012 - src.core.theme - INFO - Applied theme: light
+2025-08-15 22:48:55,415 - src.ui.main_window - INFO - Switched to view: reports
+2025-08-15 22:48:55,416 - src.ui.components.sidebar - INFO - Navigated to: reports
+2025-08-15 22:48:57,180 - src.ui.main_window - INFO - Switched to view: settings
+2025-08-15 22:48:57,181 - src.ui.components.sidebar - INFO - Navigated to: settings
+2025-08-15 22:49:01,025 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:49:01,025 - src.core.settings - INFO - Updated setting theme to dark
+2025-08-15 22:49:01,026 - src.core.theme - INFO - Applied theme: dark
+2025-08-15 22:49:03,160 - src.ui.main_window - INFO - Switched to view: reports
+2025-08-15 22:49:03,161 - src.ui.components.sidebar - INFO - Navigated to: reports
+2025-08-15 22:49:04,068 - src.ui.main_window - INFO - Switched to view: customers
+2025-08-15 22:49:04,069 - src.ui.components.sidebar - INFO - Navigated to: customers
+2025-08-15 22:49:04,875 - src.ui.main_window - INFO - Switched to view: sales
+2025-08-15 22:49:04,877 - src.ui.components.sidebar - INFO - Navigated to: sales
+2025-08-15 22:49:05,554 - src.ui.main_window - INFO - Switched to view: products
+2025-08-15 22:49:05,555 - src.ui.components.sidebar - INFO - Navigated to: products
+2025-08-15 22:49:07,662 - src.ui.main_window - INFO - Switched to view: dashboard
+2025-08-15 22:49:07,663 - src.ui.components.sidebar - INFO - Navigated to: dashboard
+2025-08-15 22:49:13,290 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:49:13,290 - src.core.settings - INFO - Updated setting theme to light
+2025-08-15 22:49:13,291 - src.core.theme - INFO - Applied theme: light
+2025-08-15 22:49:18,824 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:49:18,825 - src.core.settings - INFO - Updated setting theme to dark
+2025-08-15 22:49:18,825 - src.core.theme - INFO - Applied theme: dark
+2025-08-15 22:49:23,476 - src.core.settings - INFO - Settings saved successfully
+2025-08-15 22:49:23,477 - src.core.settings - INFO - Updated setting theme to light
+2025-08-15 22:49:23,478 - src.core.theme - INFO - Applied theme: light
+2025-08-15 22:49:40,055 - src.ui.main_window - INFO - Application closing by user
+2025-08-15 22:49:40,227 - src.core.database - INFO - Database connection closed
+2025-08-15 22:49:40,227 - src.app - INFO - Application cleanup completed

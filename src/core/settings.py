@@ -18,9 +18,9 @@ logger = get_logger(__name__)
 @dataclass
 class ShopInfo:
     """Shop information settings"""
-    name: str = "المحل الذكي"
-    owner: str = ""
-    phone: str = ""
+    name: str = "ألـحسـينـى"
+    owner: str = "أحـمـد ألـسيـسـي"
+    phone: str = "+00000000000"
     email: str = ""
     address: str = ""
     tax_number: str = ""
@@ -38,8 +38,8 @@ class DisplaySettings:
 @dataclass
 class BusinessSettings:
     """Business settings"""
-    currency: str = "ريال"
-    currency_symbol: str = "ر.س"
+    currency: str = "جنية"
+    currency_symbol: str = "ج.م"
     tax_rate: float = 15.0
     default_discount: float = 0.0
     backup_interval_days: int = 7
