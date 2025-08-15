@@ -20,7 +20,10 @@ from gui.customers_window import CustomersWindow
 from gui.reports_window import ReportsWindow
 from gui.settings_window import SettingsWindow
 from database.db_manager import DatabaseManager
-from utils.arabic_support import setup_arabic_font, create_title_font, create_heading_font, create_button_font
+from utils.arabic_support import (
+    setup_arabic_font, create_title_font, create_heading_font, 
+    create_button_font, create_body_font, get_font_manager
+)
 from config.settings import get_app_settings
 
 class MobileShopApp(ctk.CTk):
@@ -62,79 +65,89 @@ class MobileShopApp(ctk.CTk):
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(8, weight=1)
         
-        # Logo/Title
+        # Logo/Title with enhanced styling
         self.logo_label = ctk.CTkLabel(
             self.sidebar_frame,
             text="محل الموبايلات",
-            font=create_title_font(28),
+            font=create_title_font(32),
             text_color=("#1f538d", "#3b8ed0")
         )
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.logo_label.grid(row=0, column=0, padx=20, pady=(25, 10))
         
-        # Subtitle
+        # Subtitle with better font
         self.subtitle_label = ctk.CTkLabel(
             self.sidebar_frame,
             text="نظام الإدارة المتكامل",
-            font=create_heading_font(16),
+            font=create_body_font(14),
             text_color=("gray50", "gray70")
         )
-        self.subtitle_label.grid(row=1, column=0, padx=20, pady=(0, 20))
+        self.subtitle_label.grid(row=1, column=0, padx=20, pady=(0, 25))
         
-        # Navigation buttons
+        # Navigation buttons with enhanced styling
         self.dashboard_button = ctk.CTkButton(
             self.sidebar_frame,
             text="🏠 الرئيسية",
             command=self.show_dashboard,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.dashboard_button.grid(row=2, column=0, padx=20, pady=8, sticky="ew")
+        self.dashboard_button.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
         
         self.products_button = ctk.CTkButton(
             self.sidebar_frame,
             text="📱 المنتجات",
             command=self.show_products,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.products_button.grid(row=3, column=0, padx=20, pady=8, sticky="ew")
+        self.products_button.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
         
         self.sales_button = ctk.CTkButton(
             self.sidebar_frame,
             text="💰 المبيعات",
             command=self.show_sales,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.sales_button.grid(row=4, column=0, padx=20, pady=8, sticky="ew")
+        self.sales_button.grid(row=4, column=0, padx=20, pady=10, sticky="ew")
         
         self.customers_button = ctk.CTkButton(
             self.sidebar_frame,
             text="👥 العملاء",
             command=self.show_customers,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.customers_button.grid(row=5, column=0, padx=20, pady=8, sticky="ew")
+        self.customers_button.grid(row=5, column=0, padx=20, pady=10, sticky="ew")
         
         self.reports_button = ctk.CTkButton(
             self.sidebar_frame,
             text="📊 التقارير",
             command=self.show_reports,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.reports_button.grid(row=6, column=0, padx=20, pady=8, sticky="ew")
+        self.reports_button.grid(row=6, column=0, padx=20, pady=10, sticky="ew")
         
         # Settings button
         self.settings_button = ctk.CTkButton(
@@ -142,28 +155,31 @@ class MobileShopApp(ctk.CTk):
             text="⚙️ الإعدادات",
             command=self.show_settings,
             font=create_button_font(16),
-            height=45,
-            corner_radius=12,
-            hover_color=("#106ba3", "#144870")
+            height=50,
+            corner_radius=15,
+            hover_color=("#106ba3", "#144870"),
+            fg_color=("#3B8ED0", "#1F6AA5"),
+            text_color=("white", "white")
         )
-        self.settings_button.grid(row=7, column=0, padx=20, pady=8, sticky="ew")
+        self.settings_button.grid(row=7, column=0, padx=20, pady=10, sticky="ew")
         
         # Settings section
         self.settings_label = ctk.CTkLabel(
             self.sidebar_frame,
             text="التحكم",
-            font=create_heading_font(16)
+            font=create_heading_font(18)
         )
-        self.settings_label.grid(row=8, column=0, padx=20, pady=(30, 15))
+        self.settings_label.grid(row=8, column=0, padx=20, pady=(40, 20))
         
-        # Theme switch
+        # Theme switch with better styling
         self.theme_switch = ctk.CTkSwitch(
             self.sidebar_frame,
             text="المظهر الداكن",
             command=self.toggle_theme,
-            font=create_button_font(12),
-            switch_width=50,
-            switch_height=25
+            font=create_body_font(14),
+            switch_width=60,
+            switch_height=30,
+            progress_color=("#3B8ED0", "#1F6AA5")
         )
         
         # Set initial switch state
@@ -254,25 +270,49 @@ class MobileShopApp(ctk.CTk):
         
         for name, button in buttons.items():
             if name == active_button:
-                button.configure(fg_color=("#2b2b2b", "#4a4a4a"))
+                # Active button style
+                button.configure(
+                    fg_color=("#2b2b2b", "#4a4a4a"),
+                    text_color=("#FFFFFF", "#FFFFFF")
+                )
             else:
-                button.configure(fg_color=("#3B8ED0", "#1F6AA5"))
+                # Inactive button style
+                button.configure(
+                    fg_color=("#3B8ED0", "#1F6AA5"),
+                    text_color=("white", "white")
+                )
     
     def toggle_theme(self):
         """Toggle between dark and light theme"""
-        if self.theme_switch.get():
-            new_mode = "dark"
-        else:
-            new_mode = "light"
-        
-        # Update appearance
-        ctk.set_appearance_mode(new_mode)
-        
-        # Save to settings
-        self.app_settings.display.theme = new_mode
-        self.app_settings.save_settings()
-        
-        print(f"تم تغيير المظهر إلى: {new_mode}")
+        try:
+            if self.theme_switch.get():
+                new_mode = "dark"
+            else:
+                new_mode = "light"
+            
+            # Update appearance
+            ctk.set_appearance_mode(new_mode)
+            
+            # Save to settings
+            self.app_settings.display.theme = new_mode
+            self.app_settings.save_settings()
+            
+            # Refresh the interface if needed
+            self.after(100, self.refresh_ui_after_theme_change)
+            
+            print(f"تم تغيير المظهر إلى: {new_mode}")
+            
+        except Exception as e:
+            print(f"خطأ في تغيير المظهر: {e}")
+    
+    def refresh_ui_after_theme_change(self):
+        """Refresh UI elements after theme change"""
+        try:
+            # Force update the current frame if it exists
+            if self.current_frame and hasattr(self.current_frame, 'refresh_theme'):
+                self.current_frame.refresh_theme()
+        except Exception as e:
+            print(f"خطأ في تحديث الواجهة: {e}")
     
     def refresh_theme(self):
         """Refresh the theme from settings"""
