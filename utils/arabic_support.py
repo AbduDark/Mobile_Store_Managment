@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Arabic Language Support Utilities for Mobile Shop Management System
-أدوات دعم اللغة العربية لنظام إدارة محل الموبايلات
+Arabic Font Support for Mobile Shop Management System
+دعم الخطوط العربية لنظام إدارة محل الموبايلات
 """
 
-import tkinter as tk
 import customtkinter as ctk
-from tkinter import font
+from tkinter import font as tkFont
 import platform
 import os
 import sys
@@ -82,40 +81,38 @@ class ArabicFontManager:
     def _detect_available_fonts(self):
         """Detect available system fonts"""
         try:
+            # Get system fonts
+            import tkinter as tk
             root = tk.Tk()
             root.withdraw()
-            all_fonts = font.families()
+            system_fonts = list(tkFont.families())
+            root.destroy()
 
-            # Add custom fonts to available fonts
-            for custom_font in self.custom_fonts:
-                self.available_fonts.append(custom_font['name'])
+            # Combine custom and system fonts
+            self.available_fonts = [f['name'] for f in self.custom_fonts] + system_fonts
 
-            # Add system Arabic fonts
-            arabic_fonts = [
-                'Tahoma', 'Arial Unicode MS', 'Segoe UI',
-                'Calibri', 'Times New Roman', 'Microsoft Sans Serif'
-            ]
+            # Set fallback fonts if custom fonts not found
+            if not self.primary_font:
+                arabic_fonts = ['Tahoma', 'Arial Unicode MS', 'Segoe UI', 'Calibri']
+                for font in arabic_fonts:
+                    if font in system_fonts:
+                        self.primary_font = font
+                        break
+                else:
+                    self.primary_font = 'TkDefaultFont'
 
-            for font_name in arabic_fonts:
-                if font_name in all_fonts and font_name not in self.available_fonts:
-                    self.available_fonts.append(font_name)
+            if not self.secondary_font:
+                arabic_fonts = ['Tahoma', 'Arial Unicode MS', 'Segoe UI', 'Times New Roman']
+                for font in arabic_fonts:
+                    if font in system_fonts:
+                        self.secondary_font = font
+                        break
+                else:
+                    self.secondary_font = 'TkDefaultFont'
 
-            # Fallback
-            if not self.available_fonts:
-                self.available_fonts = ['TkDefaultFont']
-
-            # Set defaults if custom fonts not found
-            if not self.primary_font and self.available_fonts:
-                self.primary_font = self.available_fonts[0]
-
-            if not self.secondary_font and self.available_fonts:
-                self.secondary_font = self.available_fonts[0]
-
-            print(f"الخطوط المتاحة: {self.available_fonts}")
+            print(f"الخطوط المتاحة: {self.available_fonts[:8]}")  # Show first 8
             print(f"الخط الأساسي: {self.primary_font}")
             print(f"الخط الفرعي: {self.secondary_font}")
-
-            root.destroy()
 
         except Exception as e:
             print(f"خطأ في اكتشاف الخطوط: {e}")
@@ -211,40 +208,25 @@ def configure_widget_for_arabic(widget, font_size: int = 12, is_title: bool = Fa
 
 def create_arabic_label(parent, text: str, is_title: bool = False, **kwargs) -> ctk.CTkLabel:
     """Create a label optimized for Arabic text"""
-    font_size = kwargs.pop('font_size', 24 if is_title else 12)
+    font_size = kwargs.pop('font_size', 14 if not is_title else 20)
+    font = create_arabic_font(font_size, is_title=is_title)
 
-    label = ctk.CTkLabel(
+    return ctk.CTkLabel(
         parent,
         text=text,
-        font=create_arabic_font(font_size, is_title=is_title),
+        font=font,
+        justify='right',
         **kwargs
     )
-
-    return label
 
 def create_arabic_button(parent, text: str, **kwargs) -> ctk.CTkButton:
     """Create a button optimized for Arabic text"""
     font_size = kwargs.pop('font_size', 14)
+    font = create_button_font(font_size)
 
-    button = ctk.CTkButton(
+    return ctk.CTkButton(
         parent,
         text=text,
-        font=create_arabic_font(font_size),
+        font=font,
         **kwargs
     )
-
-    return button
-
-def setup_window_for_arabic(window):
-    """Setup window for Arabic interface"""
-    try:
-        # Configure default font
-        setup_arabic_font()
-
-        # Set window properties for Arabic
-        if hasattr(window, 'option_add'):
-            font_manager = get_font_manager()
-            window.option_add('*Font', f'{font_manager.secondary_font} 12')
-
-    except Exception as e:
-        print(f"خطأ في إعداد النافذة للعربية: {e}")
