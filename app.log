@@ -485,3 +485,11 @@
 2025-08-15 21:21:15,467 - src.ui.main_window - INFO - Switched to view: dashboard
 2025-08-15 21:21:15,467 - src.ui.main_window - INFO - Main window initialized
 2025-08-15 21:21:15,467 - src.app - INFO - Application started successfully
+2025-08-15 21:51:32,401 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
+2025-08-15 21:51:32,402 - __main__ - INFO - Application setup completed successfully
+2025-08-15 21:51:34,461 - src.core.settings - INFO - Settings loaded successfully
+2025-08-15 21:51:34,461 - src.core.settings - INFO - Settings manager initialized
+2025-08-15 21:51:34,461 - src.app - INFO - Settings manager initialized
+2025-08-15 21:51:34,526 - src.core.database - ERROR - Error initializing database: near "AUTOINCREMENT": syntax error
+2025-08-15 21:51:34,526 - src.app - ERROR - Error initializing core components: near "AUTOINCREMENT": syntax error
+2025-08-15 21:51:34,526 - __main__ - ERROR - Critical error in main application: near "AUTOINCREMENT": syntax error
