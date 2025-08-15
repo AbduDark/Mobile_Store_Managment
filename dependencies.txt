@@ -1,0 +1,63 @@
+# Mobile Shop Management System Dependencies
+# متطلبات نظام إدارة محل الموبايلات
+
+# Core GUI Framework
+customtkinter>=5.2.0
+
+# Image Processing
+Pillow>=10.0.0
+
+# Excel Export
+openpyxl>=3.1.0
+
+# Charts and Plotting
+matplotlib>=3.7.0
+
+# PDF Generation
+reportlab>=4.0.0
+
+# Barcode Generation
+python-barcode>=0.15.1
+
+# QR Code Generation
+qrcode[pil]>=7.4.2
+
+# Date and Time Utilities (built-in with Python 3.11+)
+# datetime - included with Python
+
+# Data Validation
+# typing - included with Python 3.11+
+
+# JSON Handling (built-in)
+# json - included with Python
+
+# SQLite Database (built-in)
+# sqlite3 - included with Python
+
+# File Operations (built-in)
+# os, shutil - included with Python
+
+# Regular Expressions (built-in)
+# re - included with Python
+
+# Platform Detection (built-in)
+# platform - included with Python
+
+# CSV Handling (built-in)
+# csv - included with Python
+
+# Font Handling (with tkinter)
+# tkinter.font - included with tkinter
+
+# Decimal Precision
+# decimal - included with Python
+
+# Data Classes
+# dataclasses - included with Python 3.7+
+
+# I/O Operations
+# io - included with Python
+
+## Installation Instructions:
+## لتثبيت التبعيات، استخدم الأمر التالي:
+## pip install customtkinter pillow openpyxl matplotlib reportlab python-barcode qrcode

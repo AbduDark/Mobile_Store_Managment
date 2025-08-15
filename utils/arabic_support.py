@@ -10,6 +10,7 @@ import customtkinter as ctk
 from tkinter import font
 import platform
 import os
+import glob
 from typing import Optional, Dict, Any
 
 class ArabicFontManager:
@@ -24,7 +25,35 @@ class ArabicFontManager:
         self.system = platform.system()
         self.available_fonts = []
         self.selected_font = None
+        self.fonts_directory = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fonts")
+        self.custom_fonts = []
+        self._load_custom_fonts()
         self._detect_available_fonts()
+    
+    def _load_custom_fonts(self):
+        """Load custom fonts from the fonts directory"""
+        try:
+            # Create fonts directory if it doesn't exist
+            os.makedirs(self.fonts_directory, exist_ok=True)
+            
+            # Look for font files in the fonts directory
+            font_extensions = ['*.ttf', '*.otf', '*.TTF', '*.OTF']
+            for extension in font_extensions:
+                font_files = glob.glob(os.path.join(self.fonts_directory, extension))
+                for font_file in font_files:
+                    # Extract font name from filename (without extension)
+                    font_name = os.path.splitext(os.path.basename(font_file))[0]
+                    self.custom_fonts.append({
+                        'name': font_name,
+                        'path': font_file,
+                        'family': font_name  # Use filename as family name
+                    })
+            
+            print(f"تم العثور على {len(self.custom_fonts)} خط مخصص في مجلد الخطوط")
+            
+        except Exception as e:
+            print(f"خطأ في تحميل الخطوط المخصصة: {e}")
+            self.custom_fonts = []
     
     def _detect_available_fonts(self):
         """Detect available Arabic-supporting fonts on the system"""
@@ -35,11 +64,15 @@ class ArabicFontManager:
             
             all_fonts = font.families(root)
             
-            # Check system-specific fonts first
+            # Add custom fonts first (highest priority)
+            for custom_font in self.custom_fonts:
+                self.available_fonts.append(custom_font['family'])
+            
+            # Check system-specific fonts
             system_fonts = self.default_fonts.get(self.system, [])
             
             for font_name in system_fonts:
-                if font_name in all_fonts:
+                if font_name in all_fonts and font_name not in self.available_fonts:
                     self.available_fonts.append(font_name)
             
             # Add other common Arabic fonts if available
@@ -61,6 +94,10 @@ class ArabicFontManager:
             
             # Select the first available font as default
             self.selected_font = self.available_fonts[0]
+            
+            # Print available fonts for debugging
+            print(f"الخطوط المتاحة: {self.available_fonts}")
+            print(f"الخط المحدد: {self.selected_font}")
             
             root.destroy()
             
@@ -87,6 +124,21 @@ class ArabicFontManager:
     def get_available_fonts(self) -> list:
         """Get list of available Arabic-supporting fonts"""
         return self.available_fonts.copy()
+    
+    def get_custom_fonts(self) -> list:
+        """Get list of custom fonts from fonts directory"""
+        return self.custom_fonts.copy()
+    
+    def get_fonts_directory(self) -> str:
+        """Get the fonts directory path"""
+        return self.fonts_directory
+    
+    def reload_custom_fonts(self):
+        """Reload custom fonts from the fonts directory"""
+        self.custom_fonts = []
+        self.available_fonts = []
+        self._load_custom_fonts()
+        self._detect_available_fonts()
 
 # Global font manager instance
 _font_manager = None

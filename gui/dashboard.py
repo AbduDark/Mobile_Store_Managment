@@ -20,7 +20,8 @@ class Dashboard(ctk.CTkScrollableFrame):
         self.db_manager = db_manager
         
         # Configure matplotlib for Arabic support
-        plt.rcParams['font.family'] = ['Arial Unicode MS', 'Tahoma', 'DejaVu Sans']
+        from utils.font_loader import configure_matplotlib_arabic
+        configure_matplotlib_arabic()
         
         self.create_widgets()
         self.refresh_data()
