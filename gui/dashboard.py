@@ -1,17 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Dashboard for Mobile Shop Management System
-لوحة المعلومات الرئيسية لنظام إدارة محل الموبايلات
-"""
-
 import customtkinter as ctk
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.dates as mdates
 from typing import Dict, Any
-
+from utils.arabic_support import create_title_font, create_heading_font, create_button_font, create_body_font
 class Dashboard(ctk.CTkScrollableFrame):
     """Dashboard widget with key metrics and charts"""
     
