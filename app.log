@@ -470,3 +470,18 @@
 2025-08-15 21:18:48,677 - src.ui.main_window - INFO - Switched to view: dashboard
 2025-08-15 21:18:48,678 - src.ui.main_window - INFO - Main window initialized
 2025-08-15 21:18:48,678 - src.app - INFO - Application started successfully
+2025-08-15 21:21:14,328 - __main__ - INFO - Starting Smart Mobile Shop Management System v2.0
+2025-08-15 21:21:14,329 - __main__ - INFO - Application setup completed successfully
+2025-08-15 21:21:14,945 - src.core.settings - INFO - Settings loaded successfully
+2025-08-15 21:21:14,945 - src.core.settings - INFO - Settings manager initialized
+2025-08-15 21:21:14,945 - src.app - INFO - Settings manager initialized
+2025-08-15 21:21:15,076 - src.core.database - INFO - Database tables created successfully
+2025-08-15 21:21:15,077 - src.core.database - INFO - Database initialized: data/database/shop.db
+2025-08-15 21:21:15,077 - src.app - INFO - Database manager initialized
+2025-08-15 21:21:15,077 - src.core.theme - INFO - Theme manager initialized successfully
+2025-08-15 21:21:15,077 - src.app - INFO - Theme manager initialized
+2025-08-15 21:21:15,237 - src.ui.components.header - INFO - Header bar component initialized
+2025-08-15 21:21:15,314 - src.ui.components.sidebar - INFO - Sidebar component initialized
+2025-08-15 21:21:15,467 - src.ui.main_window - INFO - Switched to view: dashboard
+2025-08-15 21:21:15,467 - src.ui.main_window - INFO - Main window initialized
+2025-08-15 21:21:15,467 - src.app - INFO - Application started successfully
