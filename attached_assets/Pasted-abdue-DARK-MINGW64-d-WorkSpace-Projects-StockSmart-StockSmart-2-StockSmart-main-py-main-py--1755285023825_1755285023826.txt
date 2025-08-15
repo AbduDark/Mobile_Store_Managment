@@ -1,0 +1,71 @@
+abdue@DARK MINGW64 /d/WorkSpace/Projects/StockSmart/StockSmart_2/StockSmart (main)
+$ py main.py 
+تهيئة قاعدة البيانات...
+تم إنشاء جداول قاعدة البيانات بنجاح
+إضافة بيانات تجريبية...
+خطأ في إضافة البيانات التجريبية: UNIQUE constraint failed: products.barcode     
+بدء تشغيل التطبيق...
+تم إنشاء جداول قاعدة البيانات بنجاح
+إضافة بيانات تجريبية...
+خطأ في إضافة البيانات التجريبية: UNIQUE constraint failed: products.barcode     
+تم تحميل الإعدادات بنجاح
+تم تحديد الخط الأساسي: Hacen-Tunisia
+مسار الخط: D:\WorkSpace\Projects\StockSmart\StockSmart_2\StockSmart\fonts\Hacen-Tunisia.ttf
+تم تحديد الخط الفرعي: Ya-ModernPro-Bold
+مسار الخط: D:\WorkSpace\Projects\StockSmart\StockSmart_2\StockSmart\fonts\Ya-ModernPro-Bold.otf
+الخط الأساسي: Hacen-Tunisia
+الخط الفرعي: Ya-ModernPro-Bold
+خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+تم تحميل الخط: Hacen Tunisia من Hacen-Tunisia.ttf
+تم تحميل الخط: Ya Modern Pro من Ya-ModernPro-Bold.otf
+تم تكوين matplotlib للعربية
+خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+qt.qpa.window: SetProcessDpiAwarenessContext() failed: Access is denied.
+Qt's default DPI awareness context is DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2. If you know what you are doing, you can overwrite this default using qt.conf (https://doc.qt.io/qt-6/highdpi.html#configuring-windows).
+تم تحميل الخط: Hacen Tunisia من Hacen-Tunisia.ttf
+تم تحميل الخط: Ya Modern Pro من Ya-ModernPro-Bold.otf
+تم تكوين matplotlib للعربية
+خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط الأزرار: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'تم تحميل الخط: Hacen Tunisia من Hacen-Tunisia.ttf
+تم تحميل الخط: Ya Modern Pro من Ya-ModernPro-Bold.otf
+تم تكوين matplotlib للعربية
+خطأ في إنشاء خط العنوان: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط العنوان الفرعي: 'ArabicFontManager' object has no attribute 'primary_font'
+خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'خطأ في إنشاء خط النص: 'ArabicFontManager' object has no attribute 'primary_font'
+abdue@DARK MINGW64 /d/WorkSpace/Projects/StockSmart/StockSmart_2/StockSmart (ma
